@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+
+{% block title %}Huzb - 确认您的帐号{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>
+        您好, {{ current_user.username }}!
+    </h1>
+    <h3>您还未验证您的邮箱.</h3>
+    <p>
+        在您进入这个页面之前您需要验证您的邮箱。
+        请查看您的邮箱是否有一封确认邮件。
+    </p>
+    <p>
+        重新发送验证邮件?
+        <a href="{{ url_for('auth.resend_confirmation') }}">点此发送</a>
+    </p>
+</div>
+{% endblock %}

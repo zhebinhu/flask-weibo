@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+
+{% block title %}Huzb - {{ user.username }}{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <img class="img-rounded profile-thumbnail" src="{{ user.gravatar(size=256) }}">
+    <h1>{{ user.username }}</h1>
+    {% if user.name or user.location %}
+    <p>
+        {% if user.name %}{{ user.name }}{% endif %}
+        {% if user.location %}
+            来自 <a href="http://maps.google.com/?q={{ user.location }}">
+            {{ user.location }}
+            </a>
+        {% endif %}
+    </p>
+    {% endif %}
+    <br>
+    <br>
+    {% if current_user.is_administrator() %}
+    <p><a href="mailto:{{ user.email }}">{{ user.email }}</a><br><br></p>
+    {% endif %}
+    {% if user.about_me %}<p>{{ user.about_me }}</p>{% endif %}
+    <p>
+        注册于 {{ moment(user.member_since).format('L') }}
+        <br>
+        <br>
+        最近登录于 {{ moment(user.last_seen).format('L') }}
+    </p>
+    <br>
+    <br>
+    <br>
+    <p>
+        {% if user == current_user %}
+            <a class="btn btn-default" href="{{ url_for('.edit_profile') }} ">编辑个人资料</a>
+        {% endif %}
+        {% if current_user.is_administrator() %}
+        <a class="btn btn-danger" href="{{ url_for('.edit_profile_admin',id=user.id) }}">编辑资料(管理员)</a>
+        {% endif %}
+    </p>
+</div>
+{% endblock %}

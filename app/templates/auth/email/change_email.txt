@@ -1,0 +1,8 @@
+亲爱的 {{ user.username }},
+
+请点击以下链接以重置您的邮箱：
+
+{{ url_for('auth.change_email', token=token, _external=True) }}
+
+Huzb 敬上
+

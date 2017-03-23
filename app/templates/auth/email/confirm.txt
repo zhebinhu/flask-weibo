@@ -1,0 +1,9 @@
+亲爱的{{ user.username }},
+
+欢迎来到Huzb的个人博客！
+
+请点击下面这个链接以完成注册：
+
+{{ url_for('auth.confirm', token=token, _external=True) }}
+
+  Huzb 敬上

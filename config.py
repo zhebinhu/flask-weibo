@@ -39,7 +39,7 @@ class Config:
     SECRET_KEY = get_env_variable('SECRET_KEY') or 'CKfQYF74QAssMz4X'
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     BLOG_MAIL_SUBJECT_PREFIX = '[Huzb]'
-    BLOG_MAIL_SENDER = 'BLOG manager <15528166872@163.com>'
+    BLOG_MAIL_SENDER = get_env_variable('BLOG_MAIL_SENDER')
     BLOG_ADMIN = get_env_variable('BLOG_ADMIN')
 
     @staticmethod

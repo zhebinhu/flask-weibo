@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from flask_pagedown.fields import PageDownField
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, TextAreaField, BooleanField, SelectField
 from wtforms.validators import Required, Length, Email, ValidationError
@@ -44,5 +45,5 @@ class EditProfileAdminForm(FlaskForm):
             raise ValidationError(u'用户名已被使用')
 
 class PostForm(FlaskForm):
-    body = TextAreaField(u"写点什么",validators=[Required()])
+    body = PageDownField(u"写点什么",validators=[Required()])
     submit = SubmitField(u'提交')

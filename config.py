@@ -41,6 +41,7 @@ class Config:
     BLOG_MAIL_SUBJECT_PREFIX = '[Huzb]'
     BLOG_MAIL_SENDER = get_env_variable('BLOG_MAIL_SENDER')
     BLOG_ADMIN = get_env_variable('BLOG_ADMIN')
+    BLOG_POSTS_PER_PAGE = 20
 
     @staticmethod
     def init_app(app):

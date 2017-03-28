@@ -2,7 +2,7 @@
 {% extends "base.html" %}
 {% import "_macros.html" as macros %}
 
-{% block title %}Huzb - {{ user.username }}{% endblock %}
+{% block title %}微博 - {{ user.username }}{% endblock %}
 
 {% block page_content %}
 <div class="page-header">
@@ -28,6 +28,20 @@
     <p>
         注册于 {{ moment(user.member_since).format('L') }}
         最近登录于 {{ moment(user.last_seen).format('L') }}
+    </p>
+    <p>
+        {% if current_user.can(Permission.FOLLOW) and user != current_user %}
+            {% if not current_user.is_following(user) %}
+            <a href="{{ url_for('.follow', username=user.username) }}" class="btn btn-primary">关注</a>
+            {% else %}
+            <a href="{{ url_for('.unfollow', username=user.username) }}" class="btn btn-default">取消关注</a>
+            {% endif %}
+        {% endif %}
+        <a href="{{ url_for('.followers', username=user.username) }}">TA的粉丝： <span class="badge">{{ user.followers.count() - 1 }}</span></a>
+        <a href="{{ url_for('.followed_by', username=user.username) }}">TA的关注： <span class="badge">{{ user.followed.count() - 1 }}</span></a>
+        {% if current_user.is_authenticated and user != current_user and user.is_following(current_user) %}
+        | <span class="label label-default">TA关注了你</span>
+        {% endif %}
     </p>
     <p>
         {% if user == current_user %}

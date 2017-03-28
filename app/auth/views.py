@@ -2,6 +2,7 @@
 from flask import flash,redirect,render_template,request,url_for
 from flask_login import logout_user,login_required,login_user,current_user
 
+from app.decorators import login_btn
 from .. import db
 from ..models import User
 from .forms import LoginForm, RegistrationForm, ChangePasswordForm, PasswordResetRequestForm, PasswordResetForm, \
@@ -21,7 +22,8 @@ def login():
     return render_template('auth/login.html',form=form)
 
 @auth.route('/register',methods=['GET','POST'])
-def register():
+@login_btn
+def register(loginform):
     form = RegistrationForm()
     if form.validate_on_submit():
         user = User(email=form.email.data,username=form.username.data,password=form.password.data)
@@ -31,7 +33,7 @@ def register():
         send_email(user.email,u'认证您的邮箱','auth/email/confirm',user=user,token=token)
         flash(u'注册成功！一封认证邮件已发送到您的邮箱')
         return redirect(url_for('auth.login'))
-    return render_template('auth/register.html',form=form)
+    return render_template('auth/register.html',form=form,loginform=loginform)
 
 @auth.route('/confirm/<token>')
 @login_required
@@ -52,10 +54,11 @@ def logout():
     return redirect(url_for('main.index'))
 
 @auth.route('/unconfirmed')
-def unconfirmed():
+@login_btn
+def unconfirmed(loginform):
     if current_user.is_anonymous() or current_user.confirmed:
         return redirect(url_for('main.index'))
-    return render_template('auth/uncomfirmed.html')
+    return render_template('auth/uncomfirmed.html',loginform=loginform)
 
 @auth.route('/confirm')
 @login_required

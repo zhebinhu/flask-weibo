@@ -35,8 +35,11 @@ div.post-thumbnail {
     position: absolute;
 }
 div.post-content {
-    margin-left: 48px;
-    min-height: 48px;
+    min-height: 80px;
+    padding: 5px 0;
+    position: relative;
+    margin-left: 0;
+    outline: 0;
 }
 div.post-footer {
     text-align: right;
@@ -105,3 +108,54 @@ div.flask-pagedown-preview h3 {
 .table.followers tr {
     border-bottom: 1px solid #e0e0e0;
 }
+
+.wb-top-nav-li {
+    background: #075fb6;
+    background: -webkit-linear-gradient(top,#055fb8,#095fb3);
+    background: linear-gradient(to bottom,#055fb8,#095fb3);
+    box-shadow: inset 0 0 2px rgba(0,0,0,.12);
+}
+
+.wb-main {
+    min-height: 340px;
+    padding: 25px 0 50px;
+    position: relative;
+    z-index: 2;
+}
+.wb-wrap {
+    width: 960px;
+    margin: 0 auto;
+    clear: both;
+}
+
+.wb-post-footer:hover{
+    color: #259;
+}
+.wb-post-footer{
+    color: #b3b3b3;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.wb-top-login {
+    float: right;
+    width: 66px;
+    height: 32px;
+    line-height: 30px;
+    margin-top: 7px;
+    border: 1px solid #045bb2;
+    border-radius: 4px;
+    background: #0e78e7;
+    background: -webkit-linear-gradient(top,#0e7bef,#0d73da);
+    background: linear-gradient(to bottom,#0e7bef,#0d73da);
+    box-shadow: 0 1px 2px rgba(0,0,0,.05), inset 0 1px 1px rgba(255,255,255,.15);
+    color: #fff;
+    font-size: 14px;
+    text-align: center;
+    text-shadow: 0 1px 1px rgba(0,0,0,.12);
+    outline: 0;
+    cursor: pointer;
+    -webkit-transition: all .2s ease-in-out;
+    transition: all .2s ease-in-out;
+}
+

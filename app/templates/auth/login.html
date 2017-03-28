@@ -1,22 +1,62 @@
 <!DOCTYPE html>
-{% extends "base.html" %}
-{% import "bootstrap/wtf.html" as wtf %}
+{#{% extends "base.html" %}#}
+{#{% import "bootstrap/wtf.html" as wtf %}#}
+{#{% block title %}微博 - 登录{% endblock %}#}
+{#{% block page_content %}#}
+{#<div class="page-header">#}
+{#    <h1>登录</h1>#}
+{#</div>#}
+{#<div class="col-md-4">#}
+{#    {{ wtf.quick_form(form) }}#}
+{#    <br>#}
+{#<p>#}
+{#    新用户？<a href="{{ url_for('auth.register') }}">点此注册</a>#}
+{#</p>#}
+{#<p>#}
+{#     <a href="{{ url_for('auth.password_reset_request') }}">忘记密码</a>#}
+{#</p>#}
+{#</div>#}
+{#{% endblock %}#}
+<div class="modal fade" id="loginMyModal" style="position: fixed;top: 25%;lef: 50%" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 500px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 class="modal-title" id="myLoginModalLabel">
+                    用户登录
+                </h4>
+            </div>
+            <form method="post">
+                <div class="modal-body">
+                    <div style="margin:0 auto">
+                            {{ loginform.hidden_tag() }}
+                            <br>
+                            <br>
+                            <div class="input-group">
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+                            {{ loginform.email(class='form-control') }}
+                            </div>
+                            <br>
+                            <div class="input-group">
+                            <span class="input-group-addon "><span class="glyphicon glyphicon-lock"></span></span>
+                            {{ loginform.password(class='form-control')}}
+                            </div>
+                            <br>
+                            {{ loginform.remember_me }}&nbsp;{{ loginform.remember_me.label }}
+                            <div style="float: right">
+                                <a href="{{ url_for('auth.password_reset_request') }}">忘记密码</a>|
+                                <a href="{{ url_for('auth.register') }}">立即注册</a>
+                            </div>
 
-{% block title %}Huzb - Login{% endblock %}
-
-{% block page_content %}
-<div class="page-header">
-    <h1>登录</h1>
+                    </div>
+                </div>
+                </br>
+                <div class="modal-footer">
+                    {{ loginform.submit(class="btn btn-primary") }}
+                </div>
+            </form>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
 </div>
-<div class="col-md-4">
-    {{ wtf.quick_form(form) }}
-    <br>
-<p>
-    新用户？<a href="{{ url_for('auth.register') }}">点此注册</a>
-</p>
-<p>
-     <a href="{{ url_for('auth.password_reset_request') }}">忘记密码</a>
-</p>
-</div>
-
-{% endblock %}

@@ -1,15 +1,61 @@
 <!DOCTYPE html>
-{% extends "base.html" %}
-{% import "bootstrap/wtf.html" as wtf %}
-
-{% block title %}Huzb - Register{% endblock %}
-
-{% block page_content %}
-<div class="page-header">
-    <h1>注册</h1>
+{#{% extends "base.html" %}#}
+{#{% import "bootstrap/wtf.html" as wtf %}#}
+{##}
+{#{% block title %}Huzb - Register{% endblock %}#}
+{##}
+{#{% block page_content %}#}
+{#<div class="page-header">#}
+{#    <h1>注册</h1>#}
+{#</div>#}
+{#<div class="col-md-4">#}
+{#    {{ wtf.quick_form(form) }}#}
+{#    <br>#}
+{#</div>#}
+{#{% endblock %}#}
+<div class="modal fade" id="registerMyModal" style="position: fixed;top: 25%;lef: 50%" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 500px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 class="modal-title">
+                    用户注册
+                </h4>
+            </div>
+            <form method="post">
+                <div class="modal-body">
+                    <div style="margin:0 auto">
+                            {{ registrationform.hidden_tag() }}
+                            <br>
+                            <br>
+                            <div class="input-group">
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span>
+                            {{ registrationform.email(class='form-control',placeholder='电子邮箱') }}
+                            </div>
+                            <br>
+                            <div class="input-group">
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+                            {{ registrationform.username(class='form-control',placeholder='用户名') }}
+                            </div>
+                            <br>
+                            <div class="input-group">
+                            <span class="input-group-addon "><span class="glyphicon glyphicon-lock"></span></span>
+                            {{ registrationform.password(class='form-control',placeholder='密码')}}
+                            </div>
+                            <br>
+                            <div class="input-group">
+                            <span class="input-group-addon "><span class="glyphicon glyphicon-lock"></span></span>
+                            {{ registrationform.password2(class='form-control',placeholder='确认密码')}}
+                            </div>
+                    </div>
+                </div>
+                </br>
+                <div class="modal-footer">
+                    {{ registrationform.submit(class="btn btn-primary") }}
+                </div>
+            </form>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
 </div>
-<div class="col-md-4">
-    {{ wtf.quick_form(form) }}
-    <br>
-</div>
-{% endblock %}

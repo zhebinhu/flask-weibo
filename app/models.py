@@ -13,10 +13,11 @@ from . import db
 from . import login_manager
 
 class Permission:
-    FOLLOW = 0x01
-    COMMENT = 0x02
-    WRITE_ARTICLES = 0x04
-    MODERATE_COMMENTS = 0x08
+    LIKE = 0x01
+    FOLLOW = 0x02
+    COMMENT = 0x04
+    WRITE_ARTICLES = 0x08
+    MODERATE_COMMENTS = 0x16
     ADMINISTER = 0x80
 
 class Role(db.Model):
@@ -34,10 +35,12 @@ class Role(db.Model):
     @staticmethod
     def insert_roles():
         roles = {
-            'User': (Permission.FOLLOW |
+            'User': (Permission.LIKE |
+                     Permission.FOLLOW |
                      Permission.COMMENT |
                      Permission.WRITE_ARTICLES, True),
-            'Moderator': (Permission.FOLLOW |
+            'Moderator': (Permission.LIKE |
+                          Permission.FOLLOW |
                           Permission.COMMENT |
                           Permission.WRITE_ARTICLES |
                           Permission.MODERATE_COMMENTS, False),
@@ -60,6 +63,8 @@ class Post(db.Model):
     author_id = db.Column(db.Integer,db.ForeignKey('users.id'))
     body_html = db.Column(db.Text)
 
+    comments = db.relationship('Comment',backref='post',lazy='dynamic')
+
     @staticmethod
     def generate_fake(count=100):
         from random import seed,randint
@@ -74,6 +79,11 @@ class Post(db.Model):
                      author=u)
             db.session.add(p)
             db.session.commit()
+            from pymysql import IntegrityError
+            try:
+                db.session.commit()
+            except IntegrityError:
+                db.session.rollback()
 
     @staticmethod
     def on_changed_body(target, value, oldvalue, initiator):
@@ -94,6 +104,9 @@ class Follow(db.Model):
                             primary_key=True)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
+likes = db.Table('likes',
+                 db.Column('user_id',db.Integer,db.ForeignKey('users.id'),primary_key=True),
+                 db.Column('post_id',db.Integer,db.ForeignKey('posts.id'),primary_key=True))
 
 class User(UserMixin,db.Model):
     __tablename__ = "users"
@@ -113,6 +126,8 @@ class User(UserMixin,db.Model):
     posts = db.relationship('Post',backref='author',lazy='dynamic')
     followed = db.relationship('Follow',foreign_keys=[Follow.follower_id],backref=db.backref('follower',lazy='joined'),lazy='dynamic',cascade='all,delete-orphan')
     followers = db.relationship('Follow',foreign_keys=[Follow.followed_id],backref=db.backref('followed',lazy='joined'),lazy='dynamic',cascade='all,delete-orphan')
+    comments = db.relationship('Comment',backref='author',lazy='dynamic')
+    posts_liked = db.relationship('Post',secondary=likes,backref=db.backref('users_liked',lazy='dynamic'),lazy='dynamic')
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -123,6 +138,7 @@ class User(UserMixin,db.Model):
                 self.role = Role.query.filter_by(default=True).first()
             if self.email is not None and self.avatar_hash is None:
                 self.avatar_hash = hashlib.md5(self.email.encode('utf-8')).hexdigest()
+        self.follow(self)
 
     def __repr__(self):
         return '<User {}>'.format(self.username.enconde('utf-8'))
@@ -243,12 +259,25 @@ class User(UserMixin,db.Model):
             db.session.delete(f)
 
     def is_following(self, user):
-        return self.followed.filter_by(
-            followed_id=user.id).first() is not None
+        return self.followed.filter_by(followed_id=user.id).first() is not None
 
     def is_followed_by(self, user):
-        return self.followers.filter_by(
-            follower_id=user.id).first() is not None
+        return self.followers.filter_by(follower_id=user.id).first() is not None
+
+    @property
+    def followed_posts(self):
+        return Post.query.join(Follow,Follow.followed_id == Post.author_id).filter(Follow.follower_id == self.id)
+
+    @staticmethod
+    def add_self_follows():
+        for user in User.query.all():
+            if not user.is_following(user):
+                user.follow(user)
+                db.session.add(user)
+                db.session.commit()
+
+    def is_liking(self,post):
+        return self.posts_liked.filter_by(id=post.id).first() is not None
 
 class AnonymousUser(AnonymousUserMixin):
     def can(self, permissions):
@@ -259,21 +288,25 @@ class AnonymousUser(AnonymousUserMixin):
 
 login_manager.anonymous_user = AnonymousUser
 
-class Entries(db.Model):
-    __tablename__ = 'entries'
+class Comment(db.Model):
+    __tablename__ = 'comments'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    title = db.Column(db.String(20), nullable=False)
-    text = db.Column(db.String(100), nullable=False)
+    body = db.Column(db.Text)
+    body_html = db.Column(db.Text)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    disabled = db.Column(db.Boolean)
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
 
-    def __init__(self, title=None, text=None):
-        self.title = title
-        self.text = text
+    @staticmethod
+    def on_changed_body(target, value, oldvalue, initiator):
+        allowed_tags = ['a', 'abbr', 'acronym', 'b', 'code', 'em', 'i',
+                        'strong']
+        target.body_html = bleach.linkify(bleach.clean(
+            markdown(value, output_format='html'),
+            tags=allowed_tags, strip=True))
 
-    def __repr__(self):
-        return '<{} {} {}> '.format(self.id, self.title.encode('utf-8'), self.text.encode('utf-8'))
-
-def init_db():
-    db.create_all()
+db.event.listen(Comment.body,'set',Comment.on_changed_body)
 
 @login_manager.user_loader
 def load_user(user_id):

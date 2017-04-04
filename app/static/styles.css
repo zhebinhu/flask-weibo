@@ -130,11 +130,13 @@ div.flask-pagedown-preview h3 {
 
 .wb-post-footer:hover{
     color: #259;
+    text-decoration: none;
 }
 .wb-post-footer{
     color: #b3b3b3;
     font-size: 12px;
     cursor: pointer;
+    text-decoration: none;
 }
 
 .wb-top-login {
@@ -159,3 +161,11 @@ div.flask-pagedown-preview h3 {
     transition: all .2s ease-in-out;
 }
 
+body{
+    overflow: auto !important;
+    padding-right:0px !important;
+}
+
+.remodal{
+    overflow:hidden;
+}

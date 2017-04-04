@@ -43,7 +43,7 @@ html.remodal-is-locked {
   display: none;
   overflow: auto;
 
-  text-align: center;
+  text-align:center;
 
   -webkit-overflow-scrolling: touch;
 }

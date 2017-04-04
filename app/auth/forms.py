@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
-from wtforms.validators import Required, Length, Email, Regexp, EqualTo, ValidationError
+from wtforms.validators import Required, Length, Email, Regexp, EqualTo, ValidationError, DataRequired
 
 from ..models import User
 
 
 class LoginForm(FlaskForm):
-    email = StringField(u'电子邮箱',validators=[Required(),Length(1,64),Email()])
-    password = PasswordField(u'密码',validators=[Required()])
+    email = StringField(u'电子邮箱',validators=[DataRequired(message=u'邮箱不能为空'),Length(1,64),Email(message=u'请输入有效的邮箱地址')],render_kw={'class':'form-control'})
+    password = PasswordField(u'密码',validators=[Required()],render_kw={'class':'form-control'})
     remember_me = BooleanField(u'记住我')
     submit = SubmitField(u'登录')
 

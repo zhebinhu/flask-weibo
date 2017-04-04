@@ -1,8 +1,7 @@
 # -*- coding:utf-8 -*-
-from flask import flash,redirect,render_template,request,url_for
+from flask import flash, redirect, render_template, request, url_for
 from flask_login import logout_user,login_required,login_user,current_user
 
-from app.decorators import login_btn
 from .. import db
 from ..models import User
 from .forms import LoginForm, RegistrationForm, ChangePasswordForm, PasswordResetRequestForm, PasswordResetForm, \
@@ -22,7 +21,6 @@ def login():
     return render_template('auth/login.html',form=form)
 
 @auth.route('/register',methods=['GET','POST'])
-@login_btn
 def register(loginform):
     form = RegistrationForm()
     if form.validate_on_submit():
@@ -54,7 +52,6 @@ def logout():
     return redirect(url_for('main.index'))
 
 @auth.route('/unconfirmed')
-@login_btn
 def unconfirmed(loginform):
     if current_user.is_anonymous() or current_user.confirmed:
         return redirect(url_for('main.index'))

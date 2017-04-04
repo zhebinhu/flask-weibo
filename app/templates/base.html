@@ -2,9 +2,37 @@
 {% extends "bootstrap/base.html" %}
 
 {% block scripts %}
-{{ super() }}
-{{ moment.include_moment()}}
-{{ moment.locale('zh-cn') }}
+    {{ super() }}
+    {{ moment.include_moment()}}
+    {{ moment.locale('zh-cn') }}
+    <script type="text/javascript" src="{{ url_for('static',filename='remodal/remodal.js') }}"></script>
+    <script type=text/javascript>$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};</script>
+    <script type="text/javascript">
+
+    $(".glyphicon-thumbs-up ").click(function(){
+        params={'id':$(this).attr("post_id")};
+        var obj = $(this);
+        if($(this).text().match("点赞*")!=null)
+        {
+            $.getJSON($SCRIPT_ROOT+'/like',params,function(data,status){
+                if(data.result)
+                {
+                    $(obj).text("取消赞");
+                }
+          });
+        }
+        else
+        {
+            $.getJSON($SCRIPT_ROOT+'/unlike',params,function(data,status){
+                if(data.result)
+                {
+                    $(obj).text("点赞");
+                }
+            });
+        }
+        return false;
+    });
+    </script>
 {% endblock %}
 
 {% block head %}
@@ -12,6 +40,8 @@
     <link rel="shortcut icon" href="{{ url_for('static',filename = 'favicon.ico') }}" type="image/x-icon">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='theme.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='remodal/remodal.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='remodal/remodal-default-theme.css') }}">
     <!--浏览器缓存禁用,开发时使用-->
     <META HTTP-EQUIV="Cache-Control" CONTENT="no-cache,no-store, must-revalidate">
     <META HTTP-EQUIV="pragma" CONTENT="no-cache">
@@ -53,22 +83,27 @@
             </form>
             <ul class="nav navbar-nav navbar-right">
                 {% if current_user.is_authenticated %}
+                {% if current_user.can(Permission.MODERATE_COMMENTS) %}
+                    <li><a href="{{ url_for('main.moderate') }}">管理评论</a> </li>
+                {% endif %}
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                         <img src="{{ current_user.gravatar(size=16) }}">
                         账户<b class="caret"></b>
                     </a>
-                    <ul class="dropdown-menu">
+                    <ul class="dropdown-menu" style="float: right">
                         <li><a href="{{ url_for('auth.change_password') }}">修改密码</a> </li>
                         <li><a href="{{ url_for('auth.change_email_request') }}">修改邮箱</a> </li>
                         <li><a href="{{ url_for('auth.logout') }}">登出</a></li>
                     </ul>
                 </li>
                 {% else %}
-                <button class="wb-top-login" data-toggle="modal" data-target="#loginMyModal">登录</button>
-                <ul class="nav navbar-nav">
-                    <li><a href="#" data-toggle="modal" data-target="#loginMyModal">注册</a></li>
+                <ul class="nav navbar-nav" style="float: right">
+{#                    <li><a href="main.index" data-toggle="modal" data-target="#loginMyModal">登录</a></li>#}
+                    <li><a href="#" data-toggle="modal" data-target="#registerMyModal">注册</a></li>
+                    <li><a href="#loginModal">登录</a></li>
                 </ul>
+                <button class="wb-top-login" id="loginButton" style="float: right" data-toggle="modal" data-target="#loginMyModal">登录</button>
                 {% endif %}
             </ul>
         </div>
@@ -91,6 +126,7 @@
 <div class="col-lg-4"></div>
 </div>
 {% if not current_user.is_authenticated%}
+{% include 'auth/register.html' %}
 {% include 'auth/login.html' %}
 {% endif %}
 {% endblock %}

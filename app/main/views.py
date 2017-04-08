@@ -19,7 +19,6 @@ def index():
             from flask_login import login_user
             login_user(user, loginform.remember_me.data)
             return redirect(request.args.get('next') or url_for('main.index'))
-        flash(u'无效的用户名或密码')
     from app import db
     from app.email import send_email
     if registrationform.validate_on_submit():
@@ -257,7 +256,9 @@ def like():
         flash(u'你已经赞了这篇微博')
         return jsonify(result=False)
     current_user.posts_liked.append(post)
-    return jsonify(result=True)
+    counts = post.users_liked.count()
+    return jsonify(result=True,counts=counts)
+
 
 @main.route('/unlike')
 @login_required
@@ -271,4 +272,5 @@ def unlike():
         flash(u'你还没有赞这篇微博')
         return jsonify(result=False)
     current_user.posts_liked.remove(post)
-    return jsonify(result=True)
+    counts = post.users_liked.count()
+    return jsonify(result=True,counts=counts)

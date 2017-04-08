@@ -8,9 +8,16 @@ from ..models import User
 
 class LoginForm(FlaskForm):
     email = StringField(u'电子邮箱',validators=[DataRequired(message=u'邮箱不能为空'),Length(1,64),Email(message=u'请输入有效的邮箱地址')],render_kw={'class':'form-control'})
-    password = PasswordField(u'密码',validators=[Required()],render_kw={'class':'form-control'})
+    password = PasswordField(u'密码',validators=[Required(message=u'密码不能为空')],render_kw={'class':'form-control'})
     remember_me = BooleanField(u'记住我')
     submit = SubmitField(u'登录')
+
+    def validate_password(self,field):
+        user=User.query.filter_by(email=self.email.data).first()
+        if user is None:
+            raise ValidationError(u'邮箱或密码错误')
+        elif not user.verify_password(field.data):
+            raise ValidationError(u'邮箱或密码错误')
 
 class RegistrationForm(FlaskForm):
     email = StringField(u'电子邮箱',validators=[Required(),Length(1,64),Email()])

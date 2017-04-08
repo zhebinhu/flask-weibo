@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-from flask import flash, redirect, render_template, request, url_for
+from flask import flash, redirect, render_template, request, url_for, g
 from flask_login import logout_user,login_required,login_user,current_user
 
 from .. import db
@@ -11,14 +11,13 @@ from ..email import send_email
 
 @auth.route('/login',methods=['GET','POST'])
 def login():
-    form = LoginForm()
-    if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
-        if user is not None and user.verify_password(form.password.data):
-            login_user(user,form.remember_me.data)
+    loginform = g.loginform
+    if loginform.validate_on_submit():
+        user = User.query.filter_by(email=loginform.email.data).first()
+        if user is not None and user.verify_password(loginform.password.data):
+            login_user(user,loginform.remember_me.data)
             return redirect(request.args.get('next') or url_for('main.index'))
-        flash(u'无效的用户名或密码')
-    return render_template('auth/login.html',form=form)
+    return render_template('auth/loginpage.html',loginform=loginform)
 
 @auth.route('/register',methods=['GET','POST'])
 def register(loginform):

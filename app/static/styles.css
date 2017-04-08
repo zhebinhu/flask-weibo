@@ -169,3 +169,19 @@ body{
 .remodal{
     overflow:hidden;
 }
+
+.password-icon {
+    padding-left:30px;
+    background-repeat: no-repeat;
+    background-position-x: 4px;
+    background-position-y: 6px;
+    background-image: url("image/password.png");
+}
+
+.email-icon {
+    padding-left:30px;
+    background-repeat: no-repeat;
+    background-position-x: 4px;
+    background-position-y: 6px;
+    background-image: url("image/email.png");
+}

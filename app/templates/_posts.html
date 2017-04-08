@@ -34,10 +34,14 @@
                     <!--此div中有两个星号，一个为已收藏图标，一个为为收藏图标-->
                     <a class="glyphicon glyphicon-star wb-post-footer">收藏</a>&nbsp&nbsp
                     <a class="glyphicon glyphicon-share wb-post-footer">分享</a>&nbsp&nbsp
-                    {% if current_user.can(Permission.LIKE) and current_user.is_liking(post) %}
-                    <a post_id="{{ post.id }}" href="#" class="glyphicon glyphicon-thumbs-up wb-post-footer" >取消赞{% if post.users_liked.count() %}({{ post.users_liked.count() }}){% endif %}</a>&nbsp&nbsp
+                    {% if current_user.can(Permission.LIKE) %}
+                    {% if current_user.is_liking(post) %}
+                    <a post_id="{{ post.id }}" href="#" class="glyphicon glyphicon-thumbs-up wb-post-footer login-in-like" >取消赞{% if post.users_liked.count() %}({{ post.users_liked.count() }}){% endif %}</a>&nbsp&nbsp
                     {% else %}
-                    <a post_id="{{ post.id }}" href="#" class="glyphicon glyphicon-thumbs-up wb-post-footer">点赞{% if post.users_liked.count() %}({{ post.users_liked.count() }}){% endif %}</a>&nbsp&nbsp
+                    <a post_id="{{ post.id }}" href="#" class="glyphicon glyphicon-thumbs-up wb-post-footer login-in-like">点赞{% if post.users_liked.count() %}({{ post.users_liked.count() }}){% endif %}</a>&nbsp&nbsp
+                    {% endif %}
+                    {% else %}
+                    <a post_id="{{ post.id }}" href="#" class="glyphicon glyphicon-thumbs-up wb-post-footer" data-toggle="modal" data-target="#loginMyModal">点赞{% if post.users_liked.count() %}({{ post.users_liked.count() }}){% endif %}</a>&nbsp&nbsp
                     {% endif %}
                     <a href="{{ url_for('main.post',id=post.id) }}#comments" class="glyphicon glyphicon-comment wb-post-footer">评论{% if post.comments.count() %}({{ post.comments.count() }}){% endif %}</a>&nbsp&nbsp
                 </div>
@@ -46,5 +50,8 @@
         </li>
         <!--一条微博的结束-->
         {% endfor %}
+        {% if not current_user.is_authenticated %}
+        {% include 'auth/login.html' %}
+        {% endif %}
     </ul>
 </div>

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+{% extends "bootstrap/base.html" %}
+
+{% block scripts %}
+    {{ super() }}
+    <script>
+    $("#login-email").focus(function () {
+          $("#login-email-message").hide();
+        });
+    $("#login-password").focus(function () {
+        $("#login-password-message").hide();
+    });
+    $(function(){
+    if($("#login-email-message").text()) {
+        $("#login-password-message").hide();
+    }
+    })
+    $(document).ready(function () {
+        $("a#choice").click(function () {
+            {#$("div").hide();
+            $("div").show();#}
+            $("div#underline").animate({left:'90px'})
+            $("#choice").css("color","#0f88eb")
+            $("#choice2").css("color","#868687")
+        })
+        $("a#choice2").click(function () {
+            {#$("div").hide();
+            $("div").show();#}
+            $("div#underline").animate({left:'170px'})
+            $("#choice2").css("color","#0f88eb")
+            $("#choice").css("color","#868687")
+        })
+    })
+    </script>
+{% endblock %}
+
+{% block head %}
+    <meta charset="UTF-8">
+    <title>微博</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap.css') }}">
+    <style>
+        a:link{
+            text-decoration: none;
+        }
+        a:hover{
+             text-decoration: none;
+        }
+        .mainbody{
+            min-height: 590px;
+            display: inline-block;
+            vertical-align: middle;
+            text-align: left;
+            white-space: normal;
+            padding: 130px 0 102px;
+            width: 300px;
+        }
+        .input-group{
+            border-radius: 0px;!important;
+        }
+        .div-marginup{
+            margin-top: 35px;
+        }
+        .line{
+            width: 40px;
+            height: 2px;
+            left: 90px;
+            position: relative;
+            background-color: #0f88eb;
+        }
+
+    </style>
+    <style>body{text-align: center;background: #F7FAFC;overflow: hidden;background: #fff;}#canvas{display: inline-block;}</style>
+
+    {% import "bootstrap/wtf.html" as wtf %}
+
+{% endblock %}
+
+{% block content %}
+
+<!--页面主体-->
+<div class="mainbody" style="position: relative;z-index: 24" >
+    <div style="margin-top: 50px;text-align: center;">
+        <span style="font-size: 80px;color: #0f88eb;font-family: 微软雅黑">微博</span>
+    </div>
+{#    <div style="text-align: center;margin-top: 20px">#}
+{#        <span style="font-size: 20px">世界那么大，我想去看看</span>#}
+{#    </div>#}
+    <div style="height: 30px">
+        <a id="choice" href="#" style="float:left;margin-left: 90px;font-size: 20px;color:#0f88eb">登录</a>
+        <a id="choice2" href="#" style="float:right;margin-right: 90px;font-size: 20px;color: #868687">注册</a>
+    </div>
+    <div id="underline" class="line"></div>
+    <div class="log div-marginup">
+        <form action="{{ url_for("auth.login") }}" class="bs-example bs-example-form" role="form" method="post" autocomplete="off">
+
+            {{ loginform.hidden_tag() }}
+            <div style="height: 47px">
+            {{ loginform.email(id='login-email',class='form-control',style='height: 47px;width: 300px;position:absolute;border:1px;border-radius: 0px',placeholder='电子邮箱') }}
+            {% for error in loginform.errors.email %}
+            <span id='login-email-message' style="position:relative;color: red;float: right;line-height: 47px;padding-right: 10px">{{ error }}</span>
+            {% endfor %}
+            </div>
+{#            <br><br><br>#}
+            <div>
+            {{ loginform.password(id='login-password',class='form-control',style='height: 47px;width: 300px;position:absolute;border:1px;border-radius: 0px',placeholder='密码') }}
+            {% for error in loginform.errors.password %}
+            <span id='login-password-message' style="position:relative;color: red;float: right;line-height: 47px;padding-right: 10px">{{ error }}</span>
+            {% endfor %}
+            </div>
+{#            <br><br><br>#}
+            <div class="div-marginup">
+            {{ loginform.submit(class="btn btn-default",style="background-color: #0f88eb;width: 300px;height: 41px;color:#FFFFFF;margin-top:47px;border:1px;border-radius: 0px")}}
+            </div>
+            <div class="div-marginup" style="float: right">
+                <a style="color: white" href="{{ url_for('auth.password_reset_request') }}">忘记密码</a>
+            </div>
+        </form>
+    </div>
+</div>
+{#<div style="background-image:url({{ url_for('static',filename='image/login.jpg') }});background-repeat:no-repeat;background-size:cover;position: absolute;width: 100%;height:100%;left: 0;top: 0;z-index: 2">#}
+{##}
+{#</div>#}
+
+<canvas id="canvas" style="background-color: #F7FAFC;z-index: 22;position: absolute;width: 100%;height: 100%;left:0;top:0;" ></canvas>
+<script>
+    //定义画布宽高和生成点的个数
+    var WIDTH = window.innerWidth, HEIGHT = window.innerHeight, POINT = 35;
+
+    var canvas = document.getElementById('canvas');
+    canvas.width = WIDTH,
+            canvas.height = HEIGHT;
+    var context = canvas.getContext('2d');
+    context.strokeStyle = 'rgba(0,0,0,0.02)',
+            context.strokeWidth = 1,
+            context.fillStyle = 'rgba(0,0,0,0.05)';
+    var circleArr = [];
+
+    //线条：开始xy坐标，结束xy坐标，线条透明度
+    function Line (x, y, _x, _y, o) {
+        this.beginX = x,
+                this.beginY = y,
+                this.closeX = _x,
+                this.closeY = _y,
+                this.o = o;
+    }
+    //点：圆心xy坐标，半径，每帧移动xy的距离
+    function Circle (x, y, r, moveX, moveY) {
+        this.x = x,
+                this.y = y,
+                this.r = r,
+                this.moveX = moveX,
+                this.moveY = moveY;
+    }
+    //生成max和min之间的随机数
+    function num (max, _min) {
+        var min = arguments[1] || 0;
+        return Math.floor(Math.random()*(max-min+1)+min);
+    }
+    // 绘制原点
+    function drawCricle (cxt, x, y, r, moveX, moveY) {
+        var circle = new Circle(x, y, r, moveX, moveY)
+        cxt.beginPath()
+        cxt.arc(circle.x, circle.y, circle.r, 0, 2*Math.PI)
+        cxt.closePath()
+        cxt.fill();
+        return circle;
+    }
+    //绘制线条
+    function drawLine (cxt, x, y, _x, _y, o) {
+        var line = new Line(x, y, _x, _y, o)
+        cxt.beginPath()
+        cxt.strokeStyle = 'rgba(0,0,0,'+ o +')'
+        cxt.moveTo(line.beginX, line.beginY)
+        cxt.lineTo(line.closeX, line.closeY)
+        cxt.closePath()
+        cxt.stroke();
+
+    }
+    //初始化生成原点
+    function init () {
+        circleArr = [];
+        for (var i = 0; i < POINT; i++) {
+            circleArr.push(drawCricle(context, num(WIDTH), num(HEIGHT), num(15, 2), num(10, -10)/40, num(10, -10)/40));
+        }
+        draw();
+    }
+
+    //每帧绘制
+    function draw () {
+        context.clearRect(0,0,canvas.width, canvas.height);
+        for (var i = 0; i < POINT; i++) {
+            drawCricle(context, circleArr[i].x, circleArr[i].y, circleArr[i].r);
+        }
+        for (var i = 0; i < POINT; i++) {
+            for (var j = 0; j < POINT; j++) {
+                if (i + j < POINT) {
+                    var A = Math.abs(circleArr[i+j].x - circleArr[i].x),
+                            B = Math.abs(circleArr[i+j].y - circleArr[i].y);
+                    var lineLength = Math.sqrt(A*A + B*B);
+                    var C = 1/lineLength*7-0.009;
+                    var lineOpacity = C > 0.03 ? 0.03 : C;
+                    if (lineOpacity > 0) {
+                        drawLine(context, circleArr[i].x, circleArr[i].y, circleArr[i+j].x, circleArr[i+j].y, lineOpacity);
+                    }
+                }
+            }
+        }
+    }
+
+    //调用执行
+    window.onload = function () {
+        init();
+        setInterval(function () {
+            for (var i = 0; i < POINT; i++) {
+                var cir = circleArr[i];
+                cir.x += cir.moveX;
+                cir.y += cir.moveY;
+                if (cir.x > WIDTH) cir.x = 0;
+                else if (cir.x < 0) cir.x = WIDTH;
+                if (cir.y > HEIGHT) cir.y = 0;
+                else if (cir.y < 0) cir.y = HEIGHT;
+
+            }
+            draw();
+        }, 16);
+    }
+
+
+</script>
+
+
+{% endblock %}

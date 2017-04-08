@@ -7,45 +7,71 @@
     {{ moment.locale('zh-cn') }}
     <script type="text/javascript" src="{{ url_for('static',filename='remodal/remodal.js') }}"></script>
     <script type=text/javascript>$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};</script>
-    <script type="text/javascript">
-
-    $(".glyphicon-thumbs-up ").click(function(){
-        params={'id':$(this).attr("post_id")};
-        var obj = $(this);
-        if($(this).text().match("点赞*")!=null)
-        {
-            $.getJSON($SCRIPT_ROOT+'/like',params,function(data,status){
-                if(data.result)
-                {
-                    $(obj).text("取消赞");
-                }
-          });
-        }
-        else
-        {
-            $.getJSON($SCRIPT_ROOT+'/unlike',params,function(data,status){
-                if(data.result)
-                {
-                    $(obj).text("点赞");
-                }
-            });
-        }
-        return false;
+    <script type="text/javascript" src="{{ url_for('static',filename='MyAjax.js') }}"></script>
+    <script>
+    $("#login-email").focus(function () {
+          $("#login-email-message").hide();
+        });
+    $("#login-password").focus(function () {
+        $("#login-password-message").hide();
     });
+    $(function(){
+        if($("#login-email-message").text()) {
+            $("#login-password-message").hide();
+            $('#loginMyModal').modal('show');
+        }
+        else if($("#login-password-message").text())
+        {
+            $('#loginMyModal').modal('show');
+        }
+    })
+    $(function () { $('#collapseTwo').collapse('show')});
+    $(function () { $('#collapseThree').collapse('show')});
+    $(function () { $('#collapseOne').collapse('show')});
+
+{#    $(document).ready(function() {#}
+{#    // 使用 jQuery 异步提交表单#}
+{#    $('#editRealMsgForm').submit(function() {#}
+{#    jQuery.ajax({#}
+{#    url: 'editRealMsg.eri',#}
+{#    data: $('#editRealMsgForm').serialize(),#}
+{#    type: "POST",#}
+{#    beforeSend: function()#}
+{#    {  #}
+{#    $('#submitButton').hide();#}
+{#    $('#editRealMsgImg').show();#}
+{#    },#}
+{#    success: function()#}
+{#    {#}
+{#    $('#editRealMsgImg').hide();#}
+{#    $('#modifyButton').show();#}
+{#    $('#realName').attr("disabled","true");#}
+{#    $('#tel').attr("disabled","true");#}
+{#    }#}
+{#    });#}
+{#    return false;#}
+{#    });#}
+{#    });#}
+    window.onload = function () {
+
+        var loginform=document.getElementById("login-form");
+        loginform.reset();
+    }
     </script>
 {% endblock %}
 
 {% block head %}
     {{ super() }}
     <link rel="shortcut icon" href="{{ url_for('static',filename = 'favicon.ico') }}" type="image/x-icon">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='theme.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
     <link rel="stylesheet" href="{{ url_for('static',filename='remodal/remodal.css') }}">
     <link rel="stylesheet" href="{{ url_for('static',filename='remodal/remodal-default-theme.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='theme.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+
     <!--浏览器缓存禁用,开发时使用-->
-    <META HTTP-EQUIV="Cache-Control" CONTENT="no-cache,no-store, must-revalidate">
-    <META HTTP-EQUIV="pragma" CONTENT="no-cache">
-    <META HTTP-EQUIV="expires" CONTENT="0">
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+    <meta http-equiv="expires" content="Wed, 26 Feb 1997 08:21:57 GMT">
 {% endblock %}
 
 {% block title %}微博{% endblock %}
@@ -99,9 +125,8 @@
                 </li>
                 {% else %}
                 <ul class="nav navbar-nav" style="float: right">
-{#                    <li><a href="main.index" data-toggle="modal" data-target="#loginMyModal">登录</a></li>#}
                     <li><a href="#" data-toggle="modal" data-target="#registerMyModal">注册</a></li>
-                    <li><a href="#loginModal">登录</a></li>
+{#                    <li><a href="#loginModal">登录</a></li>#}
                 </ul>
                 <button class="wb-top-login" id="loginButton" style="float: right" data-toggle="modal" data-target="#loginMyModal">登录</button>
                 {% endif %}
@@ -112,7 +137,14 @@
 <div style="height: 50px"></div>
 {% endblock %}
 
+<!--login and register modal-->
+{% if not current_user.is_authenticated%}
+{% include 'auth/register.html' %}
+{% include 'auth/login.html' %}
+{% endif %}
+
 {% block content %}
+
 <div class="wb-main wb-wrap">
 <div class="col-lg-8">
     {% for message in get_flashed_messages() %}
@@ -123,10 +155,8 @@
     {% endfor %}
     {% block page_content %}{% endblock %}
 </div>
-<div class="col-lg-4"></div>
+<div class="col-lg-4">
+    {% block index_panel %}{% endblock %}
 </div>
-{% if not current_user.is_authenticated%}
-{% include 'auth/register.html' %}
-{% include 'auth/login.html' %}
-{% endif %}
+</div>
 {% endblock %}

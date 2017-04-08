@@ -9,9 +9,9 @@
 {{ pagedown.include_pagedown() }}
 {% endblock %}
 {% block page_content %}
-<div class="page-header">
-    <h1>你好, {% if current_user.is_authenticated %}{{ current_user.username }}{% else %}旅行者{% endif %}!</h1>
-</div>
+{#<div class="page-header">#}
+{#    <h1>你好, {% if current_user.is_authenticated %}{{ current_user.username }}{% else %}旅行者{% endif %}!</h1>#}
+{#</div>#}
 <div>
     {% if current_user.can(Permission.WRITE_ARTICLES) %}
     {{ wtf.quick_form(postform) }}
@@ -29,4 +29,161 @@
 <div class="pagination">
     {{ macros.pagination_widget(pagination,'main.index') }}
 </div>
+{% endblock %}
+
+{% block index_panel %}
+    <div class="panel-group" id="accordion">
+    <!--我的关注-->
+    <div class="panel panel-default">
+        <div class="panel-heading" style="background-color: white">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#accordion"
+                   href="#collapseOne" style="text-decoration:none">
+                    我的关注
+                </a>
+            </h4>
+        </div>
+        <div id="collapseOne" class="panel-collapse collapse in">
+            <div class="panel-body">
+               <ul class="list-group">
+                   <!--一条关注内容-->
+                   <li class="list-group-item" style="border:0px">
+                       <div class="row" >
+                           <div class="col-xs-6">
+                                <a class="he"  style="font-size:15px;color:#595959;cursor: pointer;text-decoration:none;">神兽</a>
+                           </div>
+                           <div class="col-xs-6">
+                               <span style="font-size:10px">最近登陆时间</span>
+                           </div>
+                       </div>
+                   </li>
+                   <!--一条关注内容-->
+                   <li class="list-group-item" style="border:0px">
+                       <div class="row" >
+                           <div class="col-xs-6">
+                                <a  style="font-size:15px;color:#595959;cursor: pointer;text-decoration:none;">神兽</a>
+                           </div>
+                           <div class="col-xs-6">
+                               <span style="font-size:10px">最近登陆时间</span>
+                           </div>
+                       </div>
+                   </li>
+                   <!--一条关注内容-->
+                   <li class="list-group-item" style="border:0px">
+                       <div class="row" >
+                           <div class="col-xs-6">
+                                <a  style="font-size:15px;color:#595959;cursor: pointer;text-decoration:none;">神兽</a>
+                           </div>
+                           <div class="col-xs-6">
+                               <span style="font-size:10px">最近登陆时间</span>
+                           </div>
+                       </div>
+                   </li>
+                   <!--一条关注内容-->
+                   <li class="list-group-item" style="border:0px">
+                       <div class="row" >
+                           <div class="col-xs-6">
+                                <a  style="font-size:15px;color:#595959;cursor: pointer;text-decoration:none;">神兽</a>
+                           </div>
+                           <div class="col-xs-6">
+                               <span style="font-size:10px">最近登陆时间</span>
+                           </div>
+                       </div>
+                   </li>
+                   <!--一条关注内容-->
+                   <li class="list-group-item" style="border:0px">
+                       <div class="row" >
+                           <div class="col-xs-6">
+                                <a  style="font-size:15px;color:#595959;cursor: pointer;text-decoration:none;">神兽</a>
+                           </div>
+                           <div class="col-xs-6">
+                               <span style="font-size:10px">最近登陆时间</span>
+                           </div>
+                       </div>
+                   </li>
+               </ul>
+            </div>
+        </div>
+    </div>
+    <!--热门话题-->
+    <div class="panel panel-default">
+        <div class="panel-heading" style="background-color: white">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#accordion"
+                   href="#collapseThree" style="text-decoration:none">
+                    热门话题
+                </a>
+                <a style="font-size:8px;float:right;text-decoration:none;cursor: pointer;">换一换</a>
+            </h4>
+        </div>
+        <div id="collapseThree" class="panel-collapse collapse">
+            <div class="panel-body">
+                 <ul class="list-group">
+                   <!--一条话题内容-->
+                   <li class="list-group-item" style="border:0px">
+                       <div class="row" >
+                           <div class="col-xs-6">
+                                <a style="font-size:15px;color:#595959;cursor: pointer;text-decoration:none;">#重大新闻#</a>
+                           </div>
+                           <div class="col-xs-6">
+                               <span style="font-size:10px;float:right">1290玩</span>
+                           </div>
+                       </div>
+                   </li>
+                     <!--一条话题内容-->
+                    <li class="list-group-item" style="border:0px">
+                       <div class="row" >
+                           <div class="col-xs-6">
+                                <a style="font-size:15px;color:#595959;cursor: pointer;text-decoration:none;">#重大新闻#</a>
+                           </div>
+                           <div class="col-xs-6">
+                               <span style="font-size:10px;float:right">1290玩</span>
+                           </div>
+                       </div>
+                   </li>
+                     <!--一条话题内容-->
+                    <li class="list-group-item" style="border:0px">
+                       <div class="row" >
+                           <div class="col-xs-6">
+                                <a class="red" style="font-size:15px;color:#595959;cursor: pointer;text-decoration:none;">#重大新闻#</a>
+                           </div>
+                           <div class="col-xs-6">
+                               <span style="font-size:10px;float:right">1290玩</span>
+                           </div>
+                       </div>
+                   </li>
+                     <!--一条话题内容-->
+                    <li class="list-group-item" style="border:0px">
+                       <div class="row" >
+                           <div class="col-xs-6">
+                                <a style="font-size:15px;color:#595959;cursor: pointer;text-decoration:none;">#重大新闻#</a>
+                           </div>
+                           <div class="col-xs-6">
+                               <span style="font-size:10px;float:right">1290玩</span>
+                           </div>
+                       </div>
+                   </li>
+               </ul>
+            </div>
+        </div>
+    </div>
+    <!--其他-->
+    <div class="panel panel-default">
+        <div class="panel-heading" style="background-color: white">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#accordion"
+                   href="#collapseTwo" style="text-decoration:none">
+                    其他
+                </a>
+            </h4>
+        </div>
+        <div id="collapseTwo" class="panel-collapse collapse">
+            <div class="panel-body">
+                Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred
+                nesciunt sapiente ea proident. Ad vegan excepteur butcher vice
+                lomo.
+            </div>
+        </div>
+    </div>
+    </div>
 {% endblock %}

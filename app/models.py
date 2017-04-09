@@ -1,3 +1,4 @@
+# -*-encoding:utf-8-*-
 import hashlib
 from datetime import datetime
 
@@ -141,7 +142,7 @@ class User(UserMixin,db.Model):
         self.follow(self)
 
     def __repr__(self):
-        return '<User {}>'.format(self.username.enconde('utf-8'))
+        return '<User {}>'.format(self.username.encode("utf-8"))
 
     @property
     def password(self):

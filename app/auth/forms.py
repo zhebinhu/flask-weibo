@@ -7,7 +7,7 @@ from ..models import User
 
 
 class LoginForm(FlaskForm):
-    email = StringField(u'电子邮箱',validators=[DataRequired(message=u'邮箱不能为空'),Length(1,64),Email(message=u'请输入有效的邮箱地址')],render_kw={'class':'form-control'})
+    email = StringField(u'电子邮箱',validators=[Required(message=u'邮箱不能为空'),Length(1,64),Email(message=u'请输入有效的邮箱地址')],render_kw={'class':'form-control'})
     password = PasswordField(u'密码',validators=[Required(message=u'密码不能为空')],render_kw={'class':'form-control'})
     remember_me = BooleanField(u'记住我')
     submit = SubmitField(u'登录')
@@ -20,10 +20,10 @@ class LoginForm(FlaskForm):
             raise ValidationError(u'邮箱或密码错误')
 
 class RegistrationForm(FlaskForm):
-    email = StringField(u'电子邮箱',validators=[Required(),Length(1,64),Email()])
-    username = StringField(u'用户名',validators=[Required(),Length(1,64)])
-    password = PasswordField(u'密码',validators=[Required(),EqualTo('password2',message=u'两次密码要一致')])
-    password2 = PasswordField(u'确认密码',validators=[Required()])
+    email = StringField(u'电子邮箱',validators=[Required(message=u'邮箱不能为空'),Length(1,64),Email(message=u'请输入有效的邮箱地址')])
+    username = StringField(u'用户名',validators=[Required(message=u'用户名不能为空'),Length(1,64)])
+    password = PasswordField(u'密码',validators=[Required(message=u'密码不能为空'),EqualTo('password2',message=u'两次密码要一致')])
+    password2 = PasswordField(u'确认密码',validators=[Required(message=u'确认密码不能为空')])
     submit = SubmitField(u'提交')
 
     def validate_email(self,field):

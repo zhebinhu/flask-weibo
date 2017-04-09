@@ -1,88 +1,5 @@
 <!DOCTYPE html>
-{#{% extends "base.html" %}#}
-{#{% import "bootstrap/wtf.html" as wtf %}#}
-{#{% block title %}微博 - 登录{% endblock %}#}
-{#{% block page_content %}#}
-{#<div class="page-header">#}
-{#    <h1>登录</h1>#}
-{#</div>#}
-{#<div class="col-md-4">#}
-{#    {{ wtf.quick_form(form) }}#}
-{#    <br>#}
-{#<p>#}
-{#    新用户？<a href="{{ url_for('auth.register') }}">点此注册</a>#}
-{#</p>#}
-{#<p>#}
-{#     <a href="{{ url_for('auth.password_reset_request') }}">忘记密码</a>#}
-{#</p>#}
-{#</div>#}
-{#{% endblock %}#}
-{#{% import "bootstrap/wtf.html" as wtf %}#}
 
-{#<div class="remodal" style="width: 500px; pxposition: fixed" data-remodal-id="loginModal">#}
-{#        <div class="modal-header" style="text-align: left">#}
-{#        <button type="button" data-remodal-action="close" class="close" aria-hidden="true">#}
-{#            x#}
-{#        </button>#}
-{#        <h4 class="modal-title">用户登录</h4>#}
-{#        </div>#}
-{#            <form method="post" style="text-align: left">#}
-{#                <div class="modal-body">#}
-{#                    <div style="margin:0 auto">#}
-{#                            {{ loginform.hidden_tag() }}#}
-{#                            {{ wtf.form_field(loginform.email) }}#}
-{#                            {{ wtf.form_field(loginform.password) }}#}
-{#                            <div style="float: left">#}
-{#                            {{ loginform.remember_me }}&nbsp;{{ loginform.remember_me.label }}#}
-{#                            </div>#}
-{#                            <div style="float: right">#}
-{#                                <a href="{{ url_for('auth.password_reset_request') }}">忘记密码</a>|#}
-{#                                <a href="{{ url_for('auth.register') }}">立即注册</a>#}
-{#                            </div>#}
-{#                    </div>#}
-{#                </div>#}
-{#                </br>#}
-{#                <div class="modal-footer">#}
-{#                    {{ loginform.submit(class="btn btn-primary") }}#}
-{#                </div>#}
-{#            </form>#}
-{#                <form id="login-form" method="post" AUTOCOMPLETE="off">#}
-{#                <div class="modal-body">#}
-{#                    <div style="margin:0 auto">#}
-{#                            {{ loginform.hidden_tag() }}#}
-{#                            <br>#}
-{#                            <div>#}
-{#                            {{ loginform.email(class='form-control',placeholder='电子邮箱',id='login-email',style='position:absolute;z-index=:0;float:right;width: 465px;border-radius: 4px;') }}#}
-{#                            {% for error in loginform.errors.email %}#}
-{#                            <span id='login-email-massage' style="position:relative;z-index:12;color: red;float: right;line-height: 38px;"> {{ error }}</span>#}
-{#                            {% endfor %}#}
-{#                            </div>#}
-{#                            <br><br><br>#}
-{#                            <div>#}
-{#                            {{ loginform.password(class='form-control',placeholder='密码',id='login-password',style='position:absolute;z-index=:0;float:right;width: 465px;border-radius: 4px;')}}#}
-{#                            {% for error in loginform.errors.password %}#}
-{#                            <span id='login-password-massage' style="position:relative;z-index:12;color: red;float: right;line-height: 38px;"> {{ error }}</span>#}
-{#                            {% endfor %}#}
-{#                            </div>#}
-{#                            <br><br><br>#}
-{#                            <div style="position:absolute;z-index: 30;">#}
-{#                            {{ loginform.remember_me }}&nbsp;{{ loginform.remember_me.label }}#}
-{#                            </div>#}
-{#                            <div style="float: right">#}
-{#                                <a href="{{ url_for('auth.password_reset_request') }}">忘记密码</a>|#}
-{#                                <a href="{{ url_for('auth.register') }}">立即注册</a>#}
-{#                            </div>#}
-{##}
-{#                    </div>#}
-{#                </div>#}
-{#                </br>#}
-{#                <div class="modal-footer">#}
-{#                    {{ loginform.submit(class="btn btn-primary",id="login-submit") }}#}
-{#                </div>#}
-{#            </form>#}
-{#        </div>#}
-{#        </div>#}
-{#</div>#}
 <div class="modal fade" id="loginMyModal" style="position: fixed;top: 25%;lef: 50%;z-index: 1050" tabindex="1050" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="true">
     <div class="modal-dialog" style="width: 500px">
         <div class="modal-content">
@@ -94,23 +11,19 @@
                     用户登录
                 </h4>
             </div>
-            <form id="login-form" method="post" action="{{ url_for("main.index") }}">
+            <form id="login-form" method="post" action="{{ url_for("auth.modallogin") }}">
                 <div class="modal-body">
                     <div style="margin:0 auto">
                             {{ loginform.hidden_tag() }}
                             <br>
                             <div>
                             {{ loginform.email(class='form-control',placeholder='电子邮箱',id='login-email',style='position:absolute;z-index=:0;float:right;width: 465px;border-radius: 4px;') }}
-                            {% for error in loginform.errors.email %}
-                            <span id='login-email-message' style="position:relative;z-index:12;color: red;float: right;line-height: 38px;"> {{ error }}</span>
-                            {% endfor %}
+                            <span id='login-email-message' style="position:relative;z-index:12;color: red;float: right;line-height: 38px;"></span>
                             </div>
                             <br><br><br>
                             <div>
                             {{ loginform.password(class='form-control',placeholder='密码',id='login-password',style='position:absolute;z-index=:0;float:right;width: 465px;border-radius: 4px;')}}
-                            {% for error in loginform.errors.password %}
-                            <span id='login-password-message' style="position:relative;z-index:12;color: red;float: right;line-height: 38px;"> {{ error }}</span>
-                            {% endfor %}
+                            <span id='login-password-message' style="position:relative;z-index:12;color: red;float: right;line-height: 38px;"></span>
                             </div>
                             <br><br><br>
                             <div style="position:absolute;z-index: 30;">

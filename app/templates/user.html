@@ -7,6 +7,12 @@
 {% block page_content %}
 <div class="page-header">
     <img class="img-rounded profile-thumbnail" src="{{ user.gravatar(size=256) }}">
+    <div style="">
+    <form action="" method=post enctype=multipart/form-data>
+        <input type=file name=file><br/>
+        <input type=submit value=Upload>
+    </form>
+    </div>
     <div class="profile-header">
     <h1>{{ user.username }}</h1>
     {% if user.name or user.location %}

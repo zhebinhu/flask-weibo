@@ -34,6 +34,7 @@
 {% block index_panel %}
     <div class="panel-group" id="accordion">
     <!--我的关注-->
+    {% if current_user.is_authenticated %}
     <div class="panel panel-default">
         <div class="panel-heading" style="background-color: white">
             <h4 class="panel-title">
@@ -43,68 +44,28 @@
                 </a>
             </h4>
         </div>
+        {% for followed in followeds %}
         <div id="collapseOne" class="panel-collapse collapse in">
             <div class="panel-body">
                <ul class="list-group">
                    <!--一条关注内容-->
-                   <li class="list-group-item" style="border:0px">
+                   <li class="list-group-item" style="border:0px;">
                        <div class="row" >
                            <div class="col-xs-6">
-                                <a class="he"  style="font-size:15px;color:#595959;cursor: pointer;text-decoration:none;">神兽</a>
+                                <a href="{{ url_for('.user', username=followed.username) }}" class="he"  style="font-size:15px;color:#595959;cursor: pointer;text-decoration:none;">{{ followed.username }}</a>
                            </div>
                            <div class="col-xs-6">
-                               <span style="font-size:10px">最近登陆时间</span>
+                               <span style="font-size:10px;float: right">{{ moment(followed.last_seen).fromNow() }}</span>
                            </div>
                        </div>
                    </li>
-                   <!--一条关注内容-->
-                   <li class="list-group-item" style="border:0px">
-                       <div class="row" >
-                           <div class="col-xs-6">
-                                <a  style="font-size:15px;color:#595959;cursor: pointer;text-decoration:none;">神兽</a>
-                           </div>
-                           <div class="col-xs-6">
-                               <span style="font-size:10px">最近登陆时间</span>
-                           </div>
-                       </div>
-                   </li>
-                   <!--一条关注内容-->
-                   <li class="list-group-item" style="border:0px">
-                       <div class="row" >
-                           <div class="col-xs-6">
-                                <a  style="font-size:15px;color:#595959;cursor: pointer;text-decoration:none;">神兽</a>
-                           </div>
-                           <div class="col-xs-6">
-                               <span style="font-size:10px">最近登陆时间</span>
-                           </div>
-                       </div>
-                   </li>
-                   <!--一条关注内容-->
-                   <li class="list-group-item" style="border:0px">
-                       <div class="row" >
-                           <div class="col-xs-6">
-                                <a  style="font-size:15px;color:#595959;cursor: pointer;text-decoration:none;">神兽</a>
-                           </div>
-                           <div class="col-xs-6">
-                               <span style="font-size:10px">最近登陆时间</span>
-                           </div>
-                       </div>
-                   </li>
-                   <!--一条关注内容-->
-                   <li class="list-group-item" style="border:0px">
-                       <div class="row" >
-                           <div class="col-xs-6">
-                                <a  style="font-size:15px;color:#595959;cursor: pointer;text-decoration:none;">神兽</a>
-                           </div>
-                           <div class="col-xs-6">
-                               <span style="font-size:10px">最近登陆时间</span>
-                           </div>
-                       </div>
-                   </li>
+
                </ul>
             </div>
         </div>
+        {% endfor %}
     </div>
+    {% endif %}
     <!--热门话题-->
     <div class="panel panel-default">
         <div class="panel-heading" style="background-color: white">

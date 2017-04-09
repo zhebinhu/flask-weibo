@@ -1,10 +1,10 @@
 # -*- coding:utf-8 -*-
-from flask import flash, redirect, render_template, request, url_for, g
+from flask import flash, redirect, render_template, request, url_for, g, jsonify
 from flask_login import logout_user,login_required,login_user,current_user
 
 from .. import db
 from ..models import User
-from .forms import LoginForm, RegistrationForm, ChangePasswordForm, PasswordResetRequestForm, PasswordResetForm, \
+from .forms import ChangePasswordForm, PasswordResetRequestForm, PasswordResetForm, \
     ChangeEmailForm
 from . import auth
 from ..email import send_email
@@ -17,20 +17,44 @@ def login():
         if user is not None and user.verify_password(loginform.password.data):
             login_user(user,loginform.remember_me.data)
             return redirect(request.args.get('next') or url_for('main.index'))
-    return render_template('auth/loginpage.html',loginform=loginform)
+    return render_template('auth/loginpage.html')
+
+@auth.route('/modallogin',methods=['GET','POST'])
+def modallogin():
+    loginform = g.loginform
+    if loginform.validate_on_submit():
+        user = User.query.filter_by(email=loginform.email.data).first()
+        if user is not None and user.verify_password(loginform.password.data):
+            login_user(user,loginform.remember_me.data)
+            return jsonify(result=True)
+    return jsonify(result=False,errors=loginform.errors)
 
 @auth.route('/register',methods=['GET','POST'])
-def register(loginform):
-    form = RegistrationForm()
-    if form.validate_on_submit():
-        user = User(email=form.email.data,username=form.username.data,password=form.password.data)
+def register():
+    registrationform = g.registrationform
+    if registrationform.validate_on_submit():
+        user = User(email=registrationform.email.data,username=registrationform.username.data,password=registrationform.password.data)
         db.session.add(user)
         db.session.commit()
         token = user.generate_confirmation_token()
         send_email(user.email,u'认证您的邮箱','auth/email/confirm',user=user,token=token)
         flash(u'注册成功！一封认证邮件已发送到您的邮箱')
         return redirect(url_for('auth.login'))
-    return render_template('auth/register.html',form=form,loginform=loginform)
+    return render_template('auth/loginpage.html')
+
+@auth.route('/modalregister',methods=['GET','POST'])
+def modalregister():
+    registrationform = g.registrationform
+    if registrationform.validate_on_submit():
+        user = User(email=registrationform.email.data,username=registrationform.username.data,password=registrationform.password.data)
+        db.session.add(user)
+        db.session.commit()
+        token = user.generate_confirmation_token()
+        send_email(user.email,u'认证您的邮箱','auth/email/confirm',user=user,token=token)
+        flash(u'注册成功！一封认证邮件已发送到您的邮箱')
+        return jsonify(result=True)
+    return jsonify(result=False,errors=registrationform.errors)
+
 
 @auth.route('/confirm/<token>')
 @login_required

@@ -24,30 +24,47 @@
                     用户注册
                 </h4>
             </div>
-            <form method="post">
+            <form method="post" id="register-form" action="{{ url_for("auth.modalregister") }}">
                 <div class="modal-body">
                     <div style="margin:0 auto">
                             {{ registrationform.hidden_tag() }}
                             <br>
-                            <br>
                             <div class="input-group">
-                            <span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span>
-                            {{ registrationform.email(class='form-control',placeholder='电子邮箱') }}
+                                <span class="input-group-addon" style="height: 20px">
+                                    <span class="glyphicon glyphicon-envelope" style="height: 20px"></span>
+                                </span>
+                                {{ registrationform.email(id="register-email",class='form-control',placeholder='电子邮箱',style='position:absolute;z-index=:0;float:right;width: 424px;border-radius: 0px 4px 4px 0px;') }}
+                                <span id='register-email-message' style="position:relative;z-index:12;color: red;float: right;line-height: 38px;"></span>
                             </div>
                             <br>
+
+
                             <div class="input-group">
-                            <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
-                            {{ registrationform.username(class='form-control',placeholder='用户名') }}
+                                <span class="input-group-addon" style="height: 20px">
+                                    <span class="glyphicon glyphicon-user" style="height: 20px"></span>
+                                </span>
+                                {{ registrationform.username(id="register-username",class='form-control',placeholder='用户名',style='position:absolute;z-index=:0;float:right;width: 424px;border-radius: 0px 4px 4px 0px;') }}
+                                <span id='register-username-message' style="position:relative;z-index:12;color: red;float: right;line-height: 38px;"></span>
                             </div>
                             <br>
+
+
                             <div class="input-group">
-                            <span class="input-group-addon "><span class="glyphicon glyphicon-lock"></span></span>
-                            {{ registrationform.password(class='form-control',placeholder='密码')}}
+                                <span class="input-group-addon" style="height: 20px">
+                                    <span class="glyphicon glyphicon-lock" style="height: 20px"></span>
+                                </span>
+                                {{ registrationform.password(id="register-password",class='form-control',placeholder='密码',style='position:absolute;z-index=:0;float:right;width: 424px;border-radius: 0px 4px 4px 0px;')}}
+                                <span id='register-password-message' style="position:relative;z-index:12;color: red;float: right;line-height: 38px;"></span>
                             </div>
                             <br>
+
+
                             <div class="input-group">
-                            <span class="input-group-addon "><span class="glyphicon glyphicon-lock"></span></span>
-                            {{ registrationform.password2(class='form-control',placeholder='确认密码')}}
+                                 <span class="input-group-addon" style="height: 20px">
+                                    <span class="glyphicon glyphicon-lock" style="height: 20px"></span>
+                                </span>
+                                {{ registrationform.password2(id="register-password2",class='form-control',placeholder='确认密码',style='position:absolute;z-index=:0;float:right;width: 424px;border-radius: 0px 4px 4px 0px;')}}
+                                <span id='register-password2-message' style="position:relative;z-index:12;color: red;float: right;line-height: 38px;"></span>
                             </div>
                     </div>
                 </div>

@@ -10,27 +10,109 @@
     $("#login-password").focus(function () {
         $("#login-password-message").hide();
     });
-    $(function(){
-    if($("#login-email-message").text()) {
-        $("#login-password-message").hide();
-    }
-    })
+    $("#register-email").focus(function () {
+        $("#register-email-message").hide();
+    });
+    $("#register-username").focus(function () {
+        $("#register-username-message").hide();
+    });
+    $("#register-password").focus(function () {
+        $("#register-password-message").hide();
+    });
+    $("#register-password2-message").focus(function () {
+        $("#register-password2-message").hide();
+    });
     $(document).ready(function () {
+        $("#login-form").show();
+        $("#register-form").hide();
         $("a#choice").click(function () {
-            {#$("div").hide();
-            $("div").show();#}
+            $("#login-form").show();
+            $("#register-form").hide();
             $("div#underline").animate({left:'90px'})
             $("#choice").css("color","#0f88eb")
             $("#choice2").css("color","#868687")
         })
         $("a#choice2").click(function () {
-            {#$("div").hide();
-            $("div").show();#}
+            $("#login-form").hide();
+            $("#register-form").show();
             $("div#underline").animate({left:'170px'})
             $("#choice2").css("color","#0f88eb")
             $("#choice").css("color","#868687")
         })
     })
+    $(function () {
+        var $frm = $("#login-form");
+        $frm.submit(function (ev) {
+        $.ajax({
+            type: $frm.attr('method'),
+            url: $frm.attr('action'),
+            data: $frm.serialize(),
+            success: function (data) {
+                if(data.result)
+                {
+                    location.href="{{ url_for('main.index') }}";
+                }
+                else
+                {
+                    $("#login-password-message").hide();
+                    $("#login-email-message").hide();
+                    if(data.errors.email) {
+                        $("#login-email-message").text(data.errors.email);
+                        $("#login-email-message").show();
+                    }
+                    else if(data.errors.password) {
+                        $("#login-password-message").text(data.errors.password);
+                        $("#login-password-message").show();
+                    }
+                }
+            }
+        });
+        ev.preventDefault();
+        });
+    });
+
+    $(function () {
+        var $frm = $("#register-form");
+        $frm.submit(function (ev) {
+        $.ajax({
+            type: $frm.attr('method'),
+            url: $frm.attr('action'),
+            data: $frm.serialize(),
+            success: function (data) {
+                if(data.result)
+                {
+                    location.href="{{ url_for('auth.login') }}";
+                }
+                else
+                {
+                    $("#login-email-message").hide();
+                    $("#login-username-message").hide();
+                    $("#login-password-message").hide();
+                    $("#login-password2-message").hide();
+                    if(data.errors.email) {
+                        $("#register-email-message").text(data.errors.email);
+                        $("#register-email-message").show();
+                    }
+                    else if(data.errors.username)
+                    {
+                        $("#register-username-message").text(data.errors.username);
+                        $("#register-username-message").show();
+                    }
+                    else if(data.errors.password) {
+                        $("#register-password-message").text(data.errors.password);
+                        $("#register-password-message").show();
+                    }
+                    else if(data.errors.password2)
+                    {
+                        $("#register-password2-message").text(data.errors.password2);
+                        $("#register-password2-message").show();
+                    }
+                }
+            }
+        });
+        ev.preventDefault();
+        });
+    });
     </script>
 {% endblock %}
 
@@ -91,28 +173,47 @@
     </div>
     <div id="underline" class="line"></div>
     <div class="log div-marginup">
-        <form action="{{ url_for("auth.login") }}" class="bs-example bs-example-form" role="form" method="post" autocomplete="off">
+        <form id="login-form" action="{{ url_for("auth.modallogin") }}" class="bs-example bs-example-form" role="form" method="post">
 
             {{ loginform.hidden_tag() }}
             <div style="height: 47px">
-            {{ loginform.email(id='login-email',class='form-control',style='height: 47px;width: 300px;position:absolute;border:1px;border-radius: 0px',placeholder='电子邮箱') }}
-            {% for error in loginform.errors.email %}
-            <span id='login-email-message' style="position:relative;color: red;float: right;line-height: 47px;padding-right: 10px">{{ error }}</span>
-            {% endfor %}
+            {{ loginform.email(id='login-email',class='form-control',style='height: 47px;width: 300px;position:absolute;border:1px;border-radius: 4px 0px',placeholder='电子邮箱') }}
+            <span id='login-email-message' style="position:relative;color: red;float: right;line-height: 47px;padding-right: 10px"></span>
             </div>
-{#            <br><br><br>#}
+            <div style="height: 47px">
+            {{ loginform.password(id='login-password',class='form-control',style='height: 47px;width: 300px;position:absolute;border:1px;border-radius: 0px 4px',placeholder='密码') }}
+            <span id='login-password-message' style="position:relative;color: red;float: right;line-height: 47px;padding-right: 10px"></span>
+            </div>
+            <div style="position:absolute;margin-top:12px;padding-left: 12px">
+                {{ loginform.remember_me }}&nbsp;{{ loginform.remember_me.label }}
+            </div>
             <div>
-            {{ loginform.password(id='login-password',class='form-control',style='height: 47px;width: 300px;position:absolute;border:1px;border-radius: 0px',placeholder='密码') }}
-            {% for error in loginform.errors.password %}
-            <span id='login-password-message' style="position:relative;color: red;float: right;line-height: 47px;padding-right: 10px">{{ error }}</span>
-            {% endfor %}
+            {{ loginform.submit(class="btn btn-default",style="background-color: #0f88eb;width: 300px;height: 41px;color:#FFFFFF;margin-top:47px;border:1px;border-radius: 4px")}}
             </div>
-{#            <br><br><br>#}
-            <div class="div-marginup">
-            {{ loginform.submit(class="btn btn-default",style="background-color: #0f88eb;width: 300px;height: 41px;color:#FFFFFF;margin-top:47px;border:1px;border-radius: 0px")}}
+            <div style="float: right;margin-top: 18px">
+                <a style="color: black" href="{{ url_for('auth.password_reset_request') }}">忘记密码?</a>
             </div>
-            <div class="div-marginup" style="float: right">
-                <a style="color: white" href="{{ url_for('auth.password_reset_request') }}">忘记密码</a>
+        </form>
+        <form id="register-form" action="{{ url_for("auth.modalregister") }}" class="bs-example bs-example-form" role="form" method="post">
+            {{ registrationform.hidden_tag() }}
+            <div style="height: 47px">
+            {{ registrationform.email(id="register-email",class='form-control',placeholder='电子邮箱',style='height: 47px;width: 300px;position:absolute;border:1px;border-radius: 4px 0px') }}
+            <span id='register-email-message' style="position:relative;color: red;float: right;line-height: 47px;padding-right: 10px"></span>
+            </div>
+            <div style="height: 47px">
+            {{ registrationform.email(id="register-username",class='form-control',placeholder='用户名',style='height: 47px;width: 300px;position:absolute;border:1px;border-radius: 0px') }}
+            <span id='register-username-message' style="position:relative;color: red;float: right;line-height: 47px;padding-right: 10px"></span>
+            </div>
+            <div style="height: 47px">
+            {{ registrationform.email(id="register-password",class='form-control',placeholder='密码',style='height: 47px;width: 300px;position:absolute;border:1px;border-radius: 0px') }}
+            <span id='register-password-message' style="position:relative;color: red;float: right;line-height: 47px;padding-right: 10px"></span>
+            </div>
+            <div style="height: 47px">
+            {{ registrationform.email(id="register-password2",class='form-control',placeholder='确认密码',style='height: 47px;width: 300px;position:absolute;border:1px;border-radius: 0px 4px') }}
+            <span id='register-password2-message' style="position:relative;color: red;float: right;line-height: 47px;padding-right: 10px"></span>
+            </div>
+            <div style="margin-top: 47px">
+                {{ registrationform.submit(class="btn btn-default",style="background-color: #0f88eb;width: 300px;height: 41px;color:#FFFFFF;border:1px;border-radius: 4px") }}
             </div>
         </form>
     </div>

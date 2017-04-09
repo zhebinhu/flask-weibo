@@ -6,7 +6,8 @@ from .. import db
 from ..decorators import admin_required, permission_required
 from ..main import main
 from ..main.forms import EditProfileForm, EditProfileAdminForm, PostForm, CommentForm
-from ..models import User, Role, Permission, Post, Comment
+from ..models import User, Role, Permission, Post, Comment, Follow
+
 
 @main.route('/', methods=['GET', 'POST'])
 def index():
@@ -19,6 +20,8 @@ def index():
             from flask_login import login_user
             login_user(user, loginform.remember_me.data)
             return redirect(request.args.get('next') or url_for('main.index'))
+    else:
+        redirect(request.args.get('next') or url_for('main.index'))
     from app import db
     from app.email import send_email
     if registrationform.validate_on_submit():
@@ -44,8 +47,10 @@ def index():
         query = Post.query
     pagination = query.order_by(Post.timestamp.desc()).paginate(page,per_page=current_app.config['BLOG_POSTS_PER_PAGE'],error_out=False)
     posts = pagination.items
+    if current_user.is_authenticated:
+        followeds = User.query.filter(User.id.in_([item.followed.id for item in current_user.followed if item.followed.id!=current_user.id])).order_by(User.last_seen.desc()).limit(10).all()
+        return render_template('index.html', postform=postform, posts=posts, pagination=pagination,show_followed=show_followed,followeds = followeds)
     return render_template('index.html', postform=postform, posts=posts, pagination=pagination, show_followed=show_followed)
-
 
 @main.route('/user/<username>', methods=['GET', 'POST'])
 def user(username):

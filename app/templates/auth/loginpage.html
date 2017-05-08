@@ -158,7 +158,12 @@
 {% endblock %}
 
 {% block content %}
-
+{% for message in get_flashed_messages() %}
+<div class="alert alert-warning">
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    {{ message }}
+</div>
+{% endfor %}
 <!--页面主体-->
 <div class="mainbody" style="position: relative;z-index: 24" >
     <div style="margin-top: 50px;text-align: center;">

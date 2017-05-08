@@ -53,6 +53,7 @@ def search():
     show_search = True
     page = request.args.get('page', 1, type=int)
     show_followed = False
+    show_mine = False
     if current_user.is_authenticated:
         show_followed = bool(request.cookies.get('show_followed', ''))
         show_mine = bool(request.cookies.get('show_mine', ''))
@@ -93,6 +94,7 @@ def topic():
     show_topic = True
     page = request.args.get('page', 1, type=int)
     show_followed = False
+    show_mine = False
     post_id = list()
     t = Topic.query.filter_by(title=topic).first()
     t.pv += 1

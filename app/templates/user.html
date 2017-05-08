@@ -42,9 +42,9 @@
                         {% endif %}
                         {% if current_user.can(Permission.FOLLOW) and user != current_user %}
                         {% if not current_user.is_following(user) %}
-                        <a id="followeds_guanzhu" sign="just a sign" username="{{ user.username }}" onmouseout="out(this)" onmouseover="over(this)" class="btn btn-default" style="float: right;margin-right: 20px;border: 1px solid #0f88eb;margin-top: -7px;">关注</a>
+                        <a id="followeds_guanzhu" sign="just a sign" username="{{ user.username }}" onmouseout="out(this)" onmouseover="over(this)" class="btn btn-default" style="width:100px;float: right;margin-right: 20px;border: 1px solid #0f88eb;margin-top: -7px;">关注</a>
                         {% else %}
-                        <a id="followeds_guanzhu" sign="just a sign" username="{{ user.username }}" onmouseout="out(this)" onmouseover="over(this)" class="btn btn-default" style="float: right;margin-right: 20px;border: 1px solid #0f88eb;margin-top: -7px;">已关注</a>
+                        <a id="followeds_guanzhu" sign="just a sign" username="{{ user.username }}" onmouseout="out(this)" onmouseover="over(this)" class="btn btn-default" style="width:100px;float: right;margin-right: 20px;border: 1px solid #0f88eb;margin-top: -7px;">已关注</a>
                         {% endif %}
                         {% endif %}
                     </p>

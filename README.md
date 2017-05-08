@@ -1,5 +1,6 @@
 # blog
-###www.huzb.me
+### www.huzb.me
+
 You need to add an environment variable file in root directory named .env.In general,it should contain following items.
 
 #!/bin/sh

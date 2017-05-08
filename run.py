@@ -27,6 +27,6 @@ def inject_registrationform():
     return dict(registrationform=g.registrationform)
 
 if __name__ == '__main__':
-    app.run()
+    app.run('0.0.0.0',port=80)
 
 

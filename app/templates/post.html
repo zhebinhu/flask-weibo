@@ -10,6 +10,7 @@
 <h4 id="comments">评论</h4>
 {% if current_user.can(Permission.COMMENT) %}
 <div class="comment-form">
+    <span id="commentNum" style="float: right">bihari</span>
     {{ wtf.quick_form(commentform) }}
 </div>
 {% endif %}
@@ -19,4 +20,43 @@
     {{ macros.pagination_widget(pagination, '.post', fragment='#comments', id=posts[0].id) }}
 </div>
 {% endif %}
+{% endblock %}
+{% block index_panel %}
+    <div class="profile-lightlist">
+        <div class="panel-group">
+            <div class="panel panel-default">
+                <div class="panel-collapse collapse in">
+                    <div class="panel-body" style="display: flex;height: 100px;padding: 0px">
+                        <div style="display: block;padding: 10px">
+                            <img class="person-photo" style="width: 80px;height: 80px;border-radius: 0px" src="{{posts[0].auth.gravatar(size=80) }}">
+                        </div>
+                        <div style="display: block;margin-top: 10px;margin-bottom: 10px">
+                            <p style="color: #555555;font-size: 18px">{{ posts[0].auth.username }}</p>
+                            <p><a href="mailto:{{ posts[0].auth.email }}">{{ posts[0].auth.email }}</a></p>
+                            <p>最近登录于 {{ moment(posts[0].auth.last_seen).format('L') }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% if posts[0].auth.about_me is not none %}
+            <div class="panel panel-default" style="margin-top: 20px">
+                <div class="panel-collapse collapse in">
+                    <div class="panel-body">
+                        {{ posts[0].auth.about_me }}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="followshipcard" style="margin-top: 20px;border-radius: 5px">
+        <a id="post_followed" href="{{ url_for('main.user',username=posts[0].auth.username) }}" style="cursor: pointer">
+            <div class="numberboard-name" style="color: #8590a6">关注了</div>
+            <div class="numberboard-value" style="color: #262626">{{ posts[0].auth.followed.count() }}</div>
+        </a>
+        <a id="post_follower" href="{{ url_for('main.user',username=posts[0].auth.username) }}" style="cursor: pointer">
+            <div class="numberboard-name" style="color: #8590a6">关注者</div>
+            <div class="numberboard-value" style="color: #262626">{{ posts[0].auth.followers.count() }}</div>
+        </a>
+    </div>
 {% endblock %}

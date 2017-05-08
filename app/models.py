@@ -3,15 +3,16 @@ import hashlib
 from datetime import datetime
 
 import bleach
-from flask import current_app
+from flask import current_app, url_for
 from flask import request
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from markdown import markdown
-from werkzeug.security import generate_password_hash,check_password_hash
-from flask_login import UserMixin,AnonymousUserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin, AnonymousUserMixin
 
 from . import db
 from . import login_manager
+
 
 class Permission:
     LIKE = 0x01
@@ -21,11 +22,12 @@ class Permission:
     MODERATE_COMMENTS = 0x16
     ADMINISTER = 0x80
 
+
 class Role(db.Model):
     __tablename__ = 'roles'
-    id = db.Column(db.Integer, primary_key=True,autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(64), unique=True)
-    default = db.Column(db.Boolean,default=False,index=True)
+    default = db.Column(db.Boolean, default=False, index=True)
     permissions = db.Column(db.Integer)
 
     users = db.relationship('User', backref='role', lazy='dynamic')
@@ -56,26 +58,77 @@ class Role(db.Model):
             db.session.add(role)
         db.session.commit()
 
+
+class Follow(db.Model):
+    __tablename__ = 'follows'
+    follower_id = db.Column(db.Integer, db.ForeignKey('users.id'),
+                            primary_key=True)
+    followed_id = db.Column(db.Integer, db.ForeignKey('users.id'),
+                            primary_key=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class Relate(db.Model):
+    __tablename__ = 'relations'
+    username = db.Column(db.String(64), db.ForeignKey('users.username'),
+                         primary_key=True)
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'),
+                        primary_key=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def update(self):
+        self.timestamp = datetime.utcnow()
+
+
+likes = db.Table('likes',
+                 db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
+                 db.Column('post_id', db.Integer, db.ForeignKey('posts.id'), primary_key=True))
+
+collects = db.Table('collects',
+                    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
+                    db.Column('post_id', db.Integer, db.ForeignKey('posts.id'), primary_key=True))
+
+topic_post = db.Table('topic_post',
+                      db.Column('topic_title', db.String(64), db.ForeignKey('topics.title'), primary_key=True),
+                      db.Column('post_id', db.Integer, db.ForeignKey('posts.id'), primary_key=True))
+
+
+class Topic(db.Model):
+    __tablename__ = 'topics'
+    title = db.Column(db.String(64), primary_key=True)
+    count = db.Column(db.Integer, default=1)
+    pv = db.Column(db.Integer, default=1)
+
+    posts = db.relationship('Post', secondary=topic_post, backref=db.backref('topics', lazy='dynamic'),
+                            lazy='dynamic')
+
+    def __repr__(self):
+        return '<Topic {}>'.format(self.title.encode('utf-8'))
+
+
 class Post(db.Model):
     __tablename__ = 'posts'
-    id = db.Column(db.Integer,primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     body = db.Column(db.Text)
-    timestamp = db.Column(db.DateTime,index=True,default=datetime.utcnow)
-    author_id = db.Column(db.Integer,db.ForeignKey('users.id'))
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     body_html = db.Column(db.Text)
+    forward_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
 
-    comments = db.relationship('Comment',backref='post',lazy='dynamic')
+    comments = db.relationship('Comment', backref='post', lazy='dynamic')
+    forward_res = db.relationship('Post', remote_side=[id])
+    user_related = db.relationship('Relate', backref=db.backref('post', lazy='joined'),
+                                   foreign_keys=[Relate.post_id], lazy='dynamic', cascade='all,delete-orphan')
 
     @staticmethod
     def generate_fake(count=100):
-        from random import seed,randint
+        from random import seed, randint
         import forgery_py
-
         seed()
         user_count = User.query.count()
         for i in range(count):
-            u = User.query.offset(randint(0,user_count-1)).first()
-            p = Post(body=forgery_py.lorem_ipsum.sentences(randint(1,3)),
+            u = User.query.offset(randint(0, user_count - 1)).first()
+            p = Post(body=forgery_py.lorem_ipsum.sentences(randint(1, 3)),
                      timestamp=forgery_py.date.date(True),
                      author=u)
             db.session.add(p)
@@ -88,47 +141,46 @@ class Post(db.Model):
 
     @staticmethod
     def on_changed_body(target, value, oldvalue, initiator):
-        allowed_tags = ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code',
-                        'em', 'i', 'li', 'ol', 'pre', 'strong', 'ul',
-                        'h1', 'h2', 'h3', 'p']
+        allowed_tags = ['a', 'abbr', 'acronym', 'b', 'blockquote',
+                        'em', 'i', 'font', 'u', 'li', 'ol', 'strong', 'ul', 'p', 'br']
         target.body_html = bleach.linkify(bleach.clean(
             markdown(value, output_format='html'),
             tags=allowed_tags, strip=True))
 
-db.event.listen(Post.body,'set',Post.on_changed_body)
+    @property
+    def auth(self):
+        return User.query.filter_by(id=self.author_id).first()
 
-class Follow(db.Model):
-    __tablename__ = 'follows'
-    follower_id = db.Column(db.Integer, db.ForeignKey('users.id'),
-                            primary_key=True)
-    followed_id = db.Column(db.Integer, db.ForeignKey('users.id'),
-                            primary_key=True)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
-likes = db.Table('likes',
-                 db.Column('user_id',db.Integer,db.ForeignKey('users.id'),primary_key=True),
-                 db.Column('post_id',db.Integer,db.ForeignKey('posts.id'),primary_key=True))
-
-class User(UserMixin,db.Model):
+class User(UserMixin, db.Model):
     __tablename__ = "users"
-    id = db.Column(db.Integer, primary_key=True,autoincrement=True)
-    email = db.Column(db.String(64),unique=True,index=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    email = db.Column(db.String(64), unique=True, index=True)
     username = db.Column(db.String(64), unique=True, index=True)
     password_hash = db.Column(db.String(128))
-    confirmed = db.Column(db.Boolean,default=False)
+    confirmed = db.Column(db.Boolean, default=False)
     name = db.Column(db.String(64))
     location = db.Column(db.String(64))
     about_me = db.Column(db.Text())
-    member_since = db.Column(db.DateTime(),default=datetime.utcnow)
-    last_seen = db.Column(db.DateTime(),default=datetime.utcnow)
+    member_since = db.Column(db.DateTime(), default=datetime.utcnow)
+    last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
     avatar_hash = db.Column(db.String(32))
 
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
-    posts = db.relationship('Post',backref='author',lazy='dynamic')
-    followed = db.relationship('Follow',foreign_keys=[Follow.follower_id],backref=db.backref('follower',lazy='joined'),lazy='dynamic',cascade='all,delete-orphan')
-    followers = db.relationship('Follow',foreign_keys=[Follow.followed_id],backref=db.backref('followed',lazy='joined'),lazy='dynamic',cascade='all,delete-orphan')
-    comments = db.relationship('Comment',backref='author',lazy='dynamic')
-    posts_liked = db.relationship('Post',secondary=likes,backref=db.backref('users_liked',lazy='dynamic'),lazy='dynamic')
+    posts = db.relationship('Post', backref='author', lazy='dynamic')
+    followed = db.relationship('Follow', foreign_keys=[Follow.follower_id],
+                               backref=db.backref('follower', lazy='joined'), lazy='dynamic',
+                               cascade='all,delete-orphan')
+    followers = db.relationship('Follow', foreign_keys=[Follow.followed_id],
+                                backref=db.backref('followed', lazy='joined'), lazy='dynamic',
+                                cascade='all,delete-orphan')
+    comments = db.relationship('Comment', backref='author', lazy='dynamic')
+    posts_liked = db.relationship('Post', secondary=likes, backref=db.backref('users_liked', lazy='dynamic'),
+                                  lazy='dynamic')
+    posts_collected = db.relationship('Post', secondary=collects, backref=db.backref('users_collected', lazy='dynamic'),
+                                      lazy='dynamic')
+    posts_related = db.relationship('Relate', backref=db.backref('user', lazy='joined'),
+                                    foreign_keys=[Relate.username], lazy='dynamic', cascade='all,delete-orphan')
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -139,7 +191,7 @@ class User(UserMixin,db.Model):
                 self.role = Role.query.filter_by(default=True).first()
             if self.email is not None and self.avatar_hash is None:
                 self.avatar_hash = hashlib.md5(self.email.encode('utf-8')).hexdigest()
-        self.follow(self)
+        self.followed.append(Follow(followed=self))
 
     def __repr__(self):
         return '<User {}>'.format(self.username.encode("utf-8"))
@@ -149,17 +201,17 @@ class User(UserMixin,db.Model):
         raise AttributeError('password is not a readable attribute')
 
     @password.setter
-    def password(self,password):
+    def password(self, password):
         self.password_hash = generate_password_hash(password)
 
-    def verify_password(self,password):
-        return check_password_hash(self.password_hash,password)
+    def verify_password(self, password):
+        return check_password_hash(self.password_hash, password)
 
-    def generate_confirmation_token(self,expiration=3600):
-        s = Serializer(current_app.config['SECRET_KEY'],expires_in=expiration)
-        return s.dumps({'confirm':self.id})
+    def generate_confirmation_token(self, expiration=3600):
+        s = Serializer(current_app.config['SECRET_KEY'], expires_in=expiration)
+        return s.dumps({'confirm': self.id})
 
-    def confirm(self,token):
+    def confirm(self, token):
         s = Serializer(current_app.config['SECRET_KEY'])
         try:
             data = s.loads(token)
@@ -219,13 +271,14 @@ class User(UserMixin,db.Model):
         self.last_seen = datetime.utcnow()
         db.session.add(self)
 
-    def gravatar(self,size=100,default='identicon',rating='g'):
+    def gravatar(self, size=100, default='identicon', rating='g'):
         if request.is_secure:
             url = 'https://secure.gravatar.com/avatar'
         else:
             url = 'http://www.gravatar.com/avatar'
         hash = self.avatar_hash or hashlib.md5(self.email.encode('utf-8')).hexdigest()
-        return '{url}/{hash}?s={size}&d={default}&r={rating}'.format(url=url,hash=hash,size=size,default=default,rating=rating)
+        return '{url}/{hash}?s={size}&d={default}&r={rating}'.format(url=url, hash=hash, size=size, default=default,
+                                                                     rating=rating)
 
     @staticmethod
     def generate_fake(count=100):
@@ -267,7 +320,7 @@ class User(UserMixin,db.Model):
 
     @property
     def followed_posts(self):
-        return Post.query.join(Follow,Follow.followed_id == Post.author_id).filter(Follow.follower_id == self.id)
+        return Post.query.join(Follow, Follow.followed_id == Post.author_id).filter(Follow.follower_id == self.id)
 
     @staticmethod
     def add_self_follows():
@@ -277,8 +330,12 @@ class User(UserMixin,db.Model):
                 db.session.add(user)
                 db.session.commit()
 
-    def is_liking(self,post):
+    def is_liking(self, post):
         return self.posts_liked.filter_by(id=post.id).first() is not None
+
+    def is_collecting(self, post):
+        return self.posts_collected.filter_by(id=post.id).first() is not None
+
 
 class AnonymousUser(AnonymousUserMixin):
     def can(self, permissions):
@@ -287,7 +344,9 @@ class AnonymousUser(AnonymousUserMixin):
     def is_administrator(self):
         return False
 
+
 login_manager.anonymous_user = AnonymousUser
+
 
 class Comment(db.Model):
     __tablename__ = 'comments'
@@ -307,7 +366,9 @@ class Comment(db.Model):
             markdown(value, output_format='html'),
             tags=allowed_tags, strip=True))
 
-db.event.listen(Comment.body,'set',Comment.on_changed_body)
+
+db.event.listen(Comment.body, 'set', Comment.on_changed_body)
+
 
 @login_manager.user_loader
 def load_user(user_id):

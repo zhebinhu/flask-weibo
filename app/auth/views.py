@@ -9,7 +9,18 @@ from .forms import ChangePasswordForm, PasswordResetRequestForm, PasswordResetFo
 from . import auth
 from ..email import send_email
 
-@auth.route('/login',methods=['GET','POST'])
+@auth.before_app_request
+def before_request():
+    if current_user.is_authenticated:
+        current_user.ping()
+        if not current_user.confirmed \
+                and request.endpoint \
+                and request.endpoint[:5] != 'auth.' \
+                and request.endpoint != 'static':
+            return redirect(url_for('auth.unconfirmed'))
+
+
+@auth.route('/',methods=['GET','POST'])
 def login():
     loginform = g.loginform
     if loginform.validate_on_submit():
@@ -75,10 +86,10 @@ def logout():
     return redirect(url_for('main.index'))
 
 @auth.route('/unconfirmed')
-def unconfirmed(loginform):
-    if current_user.is_anonymous() or current_user.confirmed:
+def unconfirmed():
+    if current_user.is_anonymous or current_user.confirmed:
         return redirect(url_for('main.index'))
-    return render_template('auth/uncomfirmed.html',loginform=loginform)
+    return render_template('auth/uncomfirmed.html')
 
 @auth.route('/confirm')
 @login_required

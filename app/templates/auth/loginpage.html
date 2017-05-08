@@ -191,6 +191,8 @@
             {{ loginform.submit(class="btn btn-default",style="background-color: #0f88eb;width: 300px;height: 41px;color:#FFFFFF;margin-top:47px;border:1px;border-radius: 4px")}}
             </div>
             <div style="float: right;margin-top: 18px">
+                <a style="color: black" href="{{ url_for('main.index') }}">游客登录</a>
+                &nbsp;|&nbsp;
                 <a style="color: black" href="{{ url_for('auth.password_reset_request') }}">忘记密码?</a>
             </div>
         </form>
@@ -201,15 +203,15 @@
             <span id='register-email-message' style="position:relative;color: red;float: right;line-height: 47px;padding-right: 10px"></span>
             </div>
             <div style="height: 47px">
-            {{ registrationform.email(id="register-username",class='form-control',placeholder='用户名',style='height: 47px;width: 300px;position:absolute;border:1px;border-radius: 0px') }}
+            {{ registrationform.username(id="register-username",class='form-control',placeholder='用户名',style='height: 47px;width: 300px;position:absolute;border:1px;border-radius: 0px') }}
             <span id='register-username-message' style="position:relative;color: red;float: right;line-height: 47px;padding-right: 10px"></span>
             </div>
             <div style="height: 47px">
-            {{ registrationform.email(id="register-password",class='form-control',placeholder='密码',style='height: 47px;width: 300px;position:absolute;border:1px;border-radius: 0px') }}
+            {{ registrationform.password(id="register-password",class='form-control',placeholder='密码',style='height: 47px;width: 300px;position:absolute;border:1px;border-radius: 0px',type="password") }}
             <span id='register-password-message' style="position:relative;color: red;float: right;line-height: 47px;padding-right: 10px"></span>
             </div>
             <div style="height: 47px">
-            {{ registrationform.email(id="register-password2",class='form-control',placeholder='确认密码',style='height: 47px;width: 300px;position:absolute;border:1px;border-radius: 0px 4px') }}
+            {{ registrationform.password2(id="register-password2",class='form-control',placeholder='确认密码',style='height: 47px;width: 300px;position:absolute;border:1px;border-radius: 0px 4px',type="password") }}
             <span id='register-password2-message' style="position:relative;color: red;float: right;line-height: 47px;padding-right: 10px"></span>
             </div>
             <div style="margin-top: 47px">

@@ -1,0 +1,107 @@
+<div>
+    <ul class="posts">
+        {% for post in collects %}
+        <li class="post">
+            <div class="post-content" style="padding: 5px">
+            <div class="row">
+                <div class="col-xs-1" style="padding-right: 0px">
+                    <a href="{{ url_for('.user', username=post.author.username) }}"style="cursor: pointer">
+                        <img src="{{ post.author.gravatar(size=37)}}" width="37px" height="37px">
+                    </a>
+                </div>
+                <div class="col-xs-11" style="padding-right: 0px;padding-left: 10px">
+                    <div>
+                        <strong><a style="float: left;color: #044e97;cursor: pointer" href="{{ url_for('.user', username=post.author.username) }}">{{ post.author.username }}</a></strong>
+                        <span class="glyphicon glyphicon-chevron-down mobile-inner-header-icon mobile-inner-header-icon-out" post_id="{{ post.id }}" style="margin-right:5px;background-color:transparent;font-size:15px;color: #b3b3b3"></span>
+                    <div class="mobile-inner-nav" post_id="{{ post.id }}" style="position:absolute;z-index: 20;margin-left: 460px;">
+                        {% if current_user == post.author %}
+                        <a href="{{ url_for('.edit', id=post.id) }}">编辑</a>
+                        {% elif current_user.is_administrator() %}
+                        <a href="{{ url_for('.edit', id=post.id) }}">编辑（管理员）</a>
+                        {% endif %}
+                        <a href="{{ url_for('.post', id=post.id) }}">查看</a>
+                    </div>
+                        <ul class="dropdown-menu dropdown-menu-right" role="menu" style="position: relative;float: right">
+                            {% if current_user == post.author %}
+                            <a href="{{ url_for('.edit', id=post.id) }}">编辑</a>
+                            {% elif current_user.is_administrator() %}
+                            <a href="{{ url_for('.edit', id=post.id) }}">编辑（管理员）</a>
+                            {% endif %}
+                            <a href="{{ url_for('.post', id=post.id) }}">查看</a>
+                        </ul>
+                    </div>
+                    <br/>
+                    <span style="font-size: 10px">{{ moment(post.timestamp).fromNow() }}</span>
+                    {% if post.body_html %}
+                    {{ post.body_html | safe }}
+                    {% else %}
+                    {{ post.body }}
+                    {% endif %}
+                    {% if post.forward_res %}
+                    <div style="margin-right:8px;height: auto;background-color: #f2f2f5">
+                        <div class="rows" style="margin-left:8px">
+                            <div style="padding-top:5px;color:black" class="pull-left">
+                                <strong><a style="float: left;color: #044e97;cursor: pointer" href="{{ url_for('.user', username=post.forward_res.author.username) }}">@{{ post.forward_res.author.username }}</a></strong>
+                                &nbsp;&nbsp;&nbsp;
+                            </div>
+
+                            <div style="font-size:10px;padding-top:8px;">
+                                <span style="font-size: 10px">{{ moment(post.forward_res.timestamp).fromNow() }}</span>
+                            </div>
+                        </div>
+                        <div style="height:auto;margin-top:15px;margin-left:8px;margin-right:8px">
+                        {% if post.body_html %}
+                        {{ post.forward_res.body_html | safe }}
+                        {% else %}
+                        {{ post.forward_res.body }}
+                        {% endif %}
+                        </div>
+                        <div style="height: 45px">
+                            <div class="pull-right" style="padding-top: 18px">
+                                    {% if current_user.can(Permission.LIKE) %}
+                                        <a post_id="{{ post.forward_res.id }}" onmouseout="out(this)" onmouseover="over(this)" class="glyphicon wb-post-footer login-in-collect  {% if current_user.is_collecting(post.forward_res) %}glyphicon-star">已收藏{% else %}glyphicon-star-empty">收藏{% endif %}</a>&nbsp&nbsp
+                                        <a class="glyphicon glyphicon-share wb-post-footer">分享</a>&nbsp&nbsp
+                                        {% if current_user.is_liking(post.forward_res) %}
+                                            <a post_id="{{ post.forward_res.id }}" class="glyphicon glyphicon-thumbs-up wb-post-footer login-in-like" >取消赞{% if post.forward_res.users_liked.count() %}({{ post.forward_res.users_liked.count() }}){% endif %}</a>&nbsp&nbsp
+                                        {% else %}
+                                            <a post_id="{{ post.forward_res.id }}" class="glyphicon glyphicon-thumbs-up wb-post-footer login-in-like">点赞{% if post.forward_res.users_liked.count() %}({{ post.forward_res.users_liked.count() }}){% endif %}</a>&nbsp&nbsp
+                                        {% endif %}
+                                        <a href="{{ url_for('main.post',id=post.forward_res.id) }}" class="glyphicon glyphicon-comment wb-post-footer">评论{% if post.forward_res.comments.count() %}({{ post.forward_res.comments.count() }}){% endif %}</a>&nbsp&nbsp
+                                    {% else %}
+                                        <a href="#" class="glyphicon glyphicon-star wb-post-footer" data-toggle="modal" data-target="#loginMyModal">收藏</a>&nbsp&nbsp
+                                        <a href="#" class="glyphicon glyphicon-share wb-post-footer" data-toggle="modal" data-target="#loginMyModal">分享</a>&nbsp&nbsp
+                                        <a href="#" class="glyphicon glyphicon-thumbs-up wb-post-footer" data-toggle="modal" data-target="#loginMyModal">点赞</a>&nbsp&nbsp
+                                        <a href="#" class="glyphicon glyphicon-comment wb-post-footer" data-toggle="modal" data-target="#loginMyModal">评论</a>&nbsp&nbsp
+                                    {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <!--此div中有两个星号，一个为已收藏图标，一个为为收藏图标-->
+
+                    {% if current_user.can(Permission.LIKE) %}
+                        <a post_id="{{ post.id }}" onmouseout="out(this)" onmouseover="over(this)" class="glyphicon wb-post-footer login-in-collect  {% if current_user.is_collecting(post) %}glyphicon-star">已收藏{% else %}glyphicon-star-empty">收藏{% endif %}</a>&nbsp&nbsp
+                        <a class="glyphicon glyphicon-share wb-post-footer">分享</a>&nbsp&nbsp
+                        {% if current_user.is_liking(post) %}
+                            <a post_id="{{ post.id }}" class="glyphicon glyphicon-thumbs-up wb-post-footer login-in-like" >取消赞{% if post.users_liked.count() %}({{ post.users_liked.count() }}){% endif %}</a>&nbsp&nbsp
+                        {% else %}
+                            <a post_id="{{ post.id }}" class="glyphicon glyphicon-thumbs-up wb-post-footer login-in-like">点赞{% if post.users_liked.count() %}({{ post.users_liked.count() }}){% endif %}</a>&nbsp&nbsp
+                        {% endif %}
+                        <a href="{{ url_for('main.post',id=post.id) }}" class="glyphicon glyphicon-comment wb-post-footer">评论{% if post.comments.count() %}({{ post.comments.count() }}){% endif %}</a>&nbsp&nbsp
+                    {% else %}
+                        <a href="#" class="glyphicon glyphicon-star wb-post-footer" data-toggle="modal" data-target="#loginMyModal">收藏</a>&nbsp&nbsp
+                        <a href="#" class="glyphicon glyphicon-share wb-post-footer" data-toggle="modal" data-target="#loginMyModal">分享</a>&nbsp&nbsp
+                        <a href="#" class="glyphicon glyphicon-thumbs-up wb-post-footer" data-toggle="modal" data-target="#loginMyModal">点赞</a>&nbsp&nbsp
+                        <a href="#" class="glyphicon glyphicon-comment wb-post-footer" data-toggle="modal" data-target="#loginMyModal">评论</a>&nbsp&nbsp
+                    {% endif %}
+                </div>
+            </div>
+            </div>
+        </li>
+        <!--一条微博的结束-->
+        {% endfor %}
+        {% if not current_user.is_authenticated %}
+        {% include 'auth/login.html' %}
+        {% endif %}
+    </ul>
+</div>

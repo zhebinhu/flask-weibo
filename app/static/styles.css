@@ -22,9 +22,7 @@ ul.posts li.post {
     padding: 8px;
     border-bottom: 1px solid #e0e0e0;
 }
-ul.posts li.post:hover {
-    background-color: #f0f0f0;
-}
+
 div.post-date {
     float: right;
 }
@@ -127,7 +125,18 @@ div.flask-pagedown-preview h3 {
     margin: 0 auto;
     clear: both;
 }
-
+.wb-post-footer:active{
+    color: #b3b3b3;
+    font-size: 12px;
+    cursor: pointer;
+    text-decoration: none;
+}
+.wb-post-footer:visited{
+    color: #b3b3b3;
+    font-size: 12px;
+    cursor: pointer;
+    text-decoration: none;
+}
 .wb-post-footer:hover{
     color: #259;
     text-decoration: none;
@@ -165,6 +174,7 @@ body{
     overflow: auto !important;
     padding-right:0px !important;
     min-height: 110vh;
+    /*background-color: #f7f8fa;*/
 }
 
 .remodal{
@@ -186,3 +196,212 @@ body{
     background-position-y: 6px;
     background-image: url("image/email.png");
 }
+
+.mobile-inner-header-icon{
+    background-color: #FFFFFF;
+    height: 20px;
+    font-size:25px;
+    text-align: center;
+    float:right;
+    width: 20px;
+    position: relative;
+    -webkit-transition: background 0.5s;
+    -moz-transition: background 0.5s;
+    -o-transition: background 0.5s;
+    transition: background 0.5s;
+}
+
+.mobile-inner-header-icon:hover{
+    cursor: pointer;
+}
+
+.mobile-inner-nav{
+    box-shadow: #222222;
+    float: right;
+    box-shadow: 0px 2px 8px 1px rgba(0,0,0,0.2);
+    border: 1px solid #CCC;
+    background-color:#FFFFFF;
+    width: 100px;
+    position: relative;
+    top: 13px;
+    left: 0px;
+    display: none;
+}
+.mobile-inner-nav a{
+    display: inline-block;
+    line-height: 30px;
+    text-decoration: none;
+    width: 100%;
+    padding-left: 10px;
+    font-size: 8px;
+    color: #333;
+    border-bottom: solid 1px rgba(255,255,255,0.3);
+    -webkit-transition: all 0.5s;
+    -moz-transition: all 0.5s;
+    -o-transition: all 0.5s;
+    transition: all 0.5s;
+    font-weight:300;
+}
+
+.mobile-inner-nav a:hover{
+    color: orange;
+    background-color: #f2f2f5;
+}
+
+.main-body-1{
+    position: relative;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.usercovereditor{
+    background-color: #cccccc;
+    position: relative;
+    min-height: 180px;
+}
+
+.div-person-photo{
+    position: absolute;
+    margin-left: 30px;
+    top: -45px;
+    z-index: 5;
+}
+
+.person-photo{
+    border: 5px solid #FFFFFF;
+    border-radius: 8px;
+    width: 150px;
+    height: 150px;
+}
+
+.person-info-line{
+    height: 25px;
+}
+
+.gray{
+    color: #9fadc7;
+    margin-right: 20px;
+}
+
+.person-info a:hover{
+    text-decoration: none;
+}
+
+.person-info a:link{
+    text-decoration: none;
+}
+
+.profile-maincolumn{
+    border: 1px solid #e7eaf1;
+    display: inline;
+    width: 69%;
+    min-height: 100px;
+    float: left;
+}
+
+.profile-sidecolumn{
+    display: inline;
+    width: 30%;
+    float: right
+}
+
+.followshipcard{
+    display: flex;
+    border: 1px solid #e7eaf1;
+}
+
+.followshipcard a{
+    padding-top: 16px;
+    padding-bottom: 16px;
+    display: block;
+    width: 50%;
+    text-align: center;
+}
+
+.profile-sidecolumn a:link{
+    text-decoration: none;
+}
+
+.profile-sidecolumn a:hover{
+    text-decoration: none;
+}
+
+.numberboard-name{
+    display: block;
+}
+
+.numberboard-value{
+    display: block;
+}
+
+.profile-lightitem{
+    width: 100%;!important;
+    height: 46px;
+    display: flex;
+}
+
+.proleft{
+    color: rgb(85,85,85);
+    padding-left: 15px;
+    display: block;
+    width: 80%;
+}
+
+.proright{
+    color: rgb(133,144,166);
+    display: block;
+    width: 20%;
+}
+
+a:hover{
+    text-decoration: none;
+}
+
+a:link{
+    text-decoration: none;
+}
+
+.home-directory a{
+    color: #000000;
+    font-size: 16px;
+}
+
+.test-1{
+    width: 32px;
+    height: 2px;
+    left: 29px;
+    position: relative;
+    background: #0f88eb;
+}
+
+.W_btn_a{
+    display: inline-block;
+    height: 26px;
+    line-height: 26px;
+    width: 80px;
+    font-size: 14px;
+    background: #ff8140;
+    border: 1px solid #f77c3d;
+    color: #fff;
+    box-shadow: 0px 1px 2px rgba(0,0,0,0.25);
+}
+
+.W_btn_a:hover {
+    background: #f7671d;
+    border: 1px solid #f06923;
+}
+
+.W_btn_b{
+    background: #ffc09f;
+    color: #fff;
+    border: 1px solid #fbbd9e;
+    box-shadow: none;
+    cursor: default;
+    display: inline-block;
+    height: 26px;
+    line-height: 26px;
+    width: 80px;
+    font-size: 14px;
+    font-family: Con;
+}
+

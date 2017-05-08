@@ -9,23 +9,74 @@
 {{ pagedown.include_pagedown() }}
 {% endblock %}
 {% block page_content %}
-{#<div class="page-header">#}
-{#    <h1>你好, {% if current_user.is_authenticated %}{{ current_user.username }}{% else %}旅行者{% endif %}!</h1>#}
-{#</div>#}
-<div>
+{% if show_search %}
+    <div class="page-header">
+        <h2><span style="color: red">{{ keyword }}</span>的搜索结果</h2>
+    </div>
+    <div style="margin-top: 20px">
+        <ul class="nav nav-tabs">
+            <li{% if not show_followed and not show_mine%} class="active"{% endif %}><a href="{{ url_for('.show_all',keyword=keyword) }}">最新</a></li>
+            {% if current_user.is_authenticated %}
+                <li{% if show_followed and not show_mine%} class="active"{% endif %}><a href="{{ url_for('.show_followed',keyword=keyword) }}">关注</a></li>
+                <li{% if show_mine %} class="active"{% endif %}><a href="{{ url_for('.show_mine',keyword=keyword) }}">与我相关</a></li>
+            {% endif %}
+        </ul>
+        {% include '_posts.html' %}
+    </div>
+{% elif show_topic %}
+    <div class="page-header">
+        <h2><span style="color: red">#{{ topic.title }}# </span>的讨论</h2>
+        <div style="margin-top: 15px;padding-bottom: 5px">
+            <span style="color: #888888;font-size: 14px;">&nbsp;{{ topic.pv }}次浏览</span>
+            <span style="color: #888888;font-size: 14px;">&nbsp;&nbsp;&nbsp;&nbsp;{{ topic.count }}次讨论</span>
+        </div>
+    </div>
+    <div style="margin-top: 0px">
     {% if current_user.can(Permission.WRITE_ARTICLES) %}
-    {{ wtf.quick_form(postform) }}
+        <!--用当前元素来控制高度-->
+        <div style="height: 15px">
+            <span id = "wordnum" style="float: right;margin-top: -10px"></span>
+        </div>
+        <div id="div1" style="height:200px;max-height:200px;">
+        </div>
+        <button class="W_btn_a" style="float: right;margin-top: 10px" id="btn1">提交</button>
     {% endif %}
-</div>
-<div class="post-tabs">
-    <ul class="nav nav-tabs">
-        <li{% if not show_followed %} class="active"{% endif %}><a href="{{ url_for('.show_all') }}">全部</a></li>
-        {% if current_user.is_authenticated %}
-        <li{% if show_followed %} class="active"{% endif %}><a href="{{ url_for('.show_followed') }}">好友</a></li>
-        {% endif %}
-    </ul>
-    {% include '_posts.html' %}
-</div>
+    </div>
+    <div style="margin-top: 20px">
+        <ul class="nav nav-tabs">
+            <li{% if not show_followed and not show_mine%} class="active"{% endif %}><a href="{{ url_for('.show_all',topic=topic.title) }}">最新</a></li>
+            {% if current_user.is_authenticated %}
+                <li{% if show_followed and not show_mine%} class="active"{% endif %}><a href="{{ url_for('.show_followed',topic=topic.title) }}">关注</a></li>
+                <li{% if show_mine %} class="active"{% endif %}><a href="{{ url_for('.show_mine',topic=topic.title) }}">与我相关</a></li>
+            {% endif %}
+        </ul>
+        {% include '_posts.html' %}
+    </div>
+{% else %}
+    <div style="margin-top: 20px">
+    {% if current_user.can(Permission.WRITE_ARTICLES) %}
+        <!--用当前元素来控制高度-->
+        <div>
+            <img src="../static/image/title.jpg" alt="">
+            <span id = "wordnum" style="float: right"></span>
+        </div>
+        <div id="div1" style="height:200px;max-height:200px;">
+        </div>
+        <button class="W_btn_b" disabled="disabled" style="float: right;margin-top: 10px" id="btn1">提交</button>
+    {% endif %}
+    </div>
+    <div style="margin-top: 20px">
+        <ul class="nav nav-tabs">
+            <li{% if not show_followed and not show_mine%} class="active"{% endif %}><a href="{{ url_for('.show_all') }}">最新</a></li>
+            {% if current_user.is_authenticated %}
+                <li{% if show_followed and not show_mine%} class="active"{% endif %}><a href="{{ url_for('.show_followed') }}">关注</a></li>
+                <li{% if show_mine %} class="active"{% endif %}><a href="{{ url_for('.show_mine') }}">与我相关</a></li>
+            {% endif %}
+        </ul>
+        {% include '_posts.html' %}
+    </div>
+{% endif %}
+
 <div class="pagination">
     {{ macros.pagination_widget(pagination,'main.index') }}
 </div>
@@ -33,118 +84,218 @@
 
 {% block index_panel %}
     <div class="panel-group" id="accordion">
-    <!--我的关注-->
     {% if current_user.is_authenticated %}
     <div class="panel panel-default">
         <div class="panel-heading" style="background-color: white">
             <h4 class="panel-title">
                 <a data-toggle="collapse" data-parent="#accordion"
-                   href="#collapseOne" style="text-decoration:none">
-                    我的关注
+                   href="#collapseOne" style="text-decoration:none;font-size: 14px">
+                    <strong>最近登录</strong>
                 </a>
             </h4>
         </div>
-        {% for followed in followeds %}
+        {% if current_user.followed.count() > 1 %}
         <div id="collapseOne" class="panel-collapse collapse in">
-            <div class="panel-body">
-               <ul class="list-group">
+            <div class="panel-body" style="padding-top: 0px;padding-bottom: 0px">
+               <ul class="list-group" style="margin-bottom: 15px">
                    <!--一条关注内容-->
-                   <li class="list-group-item" style="border:0px;">
+                   <li class="list-group-item" style="border:0px;padding-top: 0px;padding-bottom: 0px">
                        <div class="row" >
-                           <div class="col-xs-6">
-                                <a href="{{ url_for('.user', username=followed.username) }}" class="he"  style="font-size:15px;color:#595959;cursor: pointer;text-decoration:none;">{{ followed.username }}</a>
+                           <!--一个关注的人-->
+                           {% for followed in followeds %}
+                           <div focus="focus" class="col-lg-4" style="margin-top: 18px">
+                               <img class="center-block" src="{{ followed.gravatar(size=42)}}" width="42px" height="42px" style="border-radius:50%;" href="{{ url_for('.user', username=followed.username)}}">
+                               <div style="margin-top: 2px;text-align: center"><a style="cursor:pointer;color:#222222;font-size:12px;text-decoration:none;" href="{{ url_for('.user', username=followed.username)}}"}}>{{ followed.username }}</a></div>
+                               <div style="font-size:10px;text-align: center">{{ moment(followed.last_seen).fromNow() }}</div>
                            </div>
-                           <div class="col-xs-6">
-                               <span style="font-size:10px;float: right">{{ moment(followed.last_seen).fromNow() }}</span>
-                           </div>
+                           {% endfor %}
                        </div>
                    </li>
 
                </ul>
             </div>
+        {% endif %}
+        {% if current_user.followed.count() > 4 %}
+        <div id="displaymore" class="panel-footer" style="background: white;text-align: center;border-top: solid 1px #dddddd;height: 30px;font-size:14px;padding: 5px">
+            <a style="cursor: pointer;color: #888888">查看更多</a>
         </div>
-        {% endfor %}
+        {% endif %}
+        </div>
+
+
     </div>
     {% endif %}
     <!--热门话题-->
-    <div class="panel panel-default">
+    {% if current_user.is_authenticated %}
+    <div class="panel panel-default" style="margin-top: 20px">
+    {% else %}
+    <div class="panel panel-default" style="margin-top: 0px">
+    {% endif %}
         <div class="panel-heading" style="background-color: white">
             <h4 class="panel-title">
                 <a data-toggle="collapse" data-parent="#accordion"
-                   href="#collapseThree" style="text-decoration:none">
-                    热门话题
+                   href="#collapseTwo" style="text-decoration:none;font-size: 14px">
+                    <strong>热门话题</strong>
                 </a>
                 <a style="font-size:8px;float:right;text-decoration:none;cursor: pointer;">换一换</a>
             </h4>
         </div>
-        <div id="collapseThree" class="panel-collapse collapse">
+        <div id="collapseTwo" class="panel-collapse collapse">
             <div class="panel-body">
                  <ul class="list-group">
-                   <!--一条话题内容-->
-                   <li class="list-group-item" style="border:0px">
-                       <div class="row" >
-                           <div class="col-xs-6">
-                                <a style="font-size:15px;color:#595959;cursor: pointer;text-decoration:none;">#重大新闻#</a>
+                    {% for hottopic in hottopics %}
+                        <!--一条话题内容-->
+                       <li class="list-group-item" style="border:0px">
+                           <div class="row" >
+                               <div class="col-xs-9">
+                                    <a class="replace_body" style="font-size:15px;color:#595959;cursor: pointer;text-decoration:none;">#{{ hottopic.title }}#</a>
+                               </div>
+                               <div class="col-xs-3">
+                                   <span style="font-size:10px;float:right">{{ hottopic.pv }}</span>
+                               </div>
                            </div>
-                           <div class="col-xs-6">
-                               <span style="font-size:10px;float:right">1290玩</span>
-                           </div>
-                       </div>
-                   </li>
-                     <!--一条话题内容-->
-                    <li class="list-group-item" style="border:0px">
-                       <div class="row" >
-                           <div class="col-xs-6">
-                                <a style="font-size:15px;color:#595959;cursor: pointer;text-decoration:none;">#重大新闻#</a>
-                           </div>
-                           <div class="col-xs-6">
-                               <span style="font-size:10px;float:right">1290玩</span>
-                           </div>
-                       </div>
-                   </li>
-                     <!--一条话题内容-->
-                    <li class="list-group-item" style="border:0px">
-                       <div class="row" >
-                           <div class="col-xs-6">
-                                <a class="red" style="font-size:15px;color:#595959;cursor: pointer;text-decoration:none;">#重大新闻#</a>
-                           </div>
-                           <div class="col-xs-6">
-                               <span style="font-size:10px;float:right">1290玩</span>
-                           </div>
-                       </div>
-                   </li>
-                     <!--一条话题内容-->
-                    <li class="list-group-item" style="border:0px">
-                       <div class="row" >
-                           <div class="col-xs-6">
-                                <a style="font-size:15px;color:#595959;cursor: pointer;text-decoration:none;">#重大新闻#</a>
-                           </div>
-                           <div class="col-xs-6">
-                               <span style="font-size:10px;float:right">1290玩</span>
-                           </div>
-                       </div>
-                   </li>
-               </ul>
+                       </li>
+                     {% endfor %}
+                 </ul>
             </div>
         </div>
     </div>
     <!--其他-->
-    <div class="panel panel-default">
+    <div class="panel panel-default" style="margin-top: 20px">
         <div class="panel-heading" style="background-color: white">
             <h4 class="panel-title">
                 <a data-toggle="collapse" data-parent="#accordion"
-                   href="#collapseTwo" style="text-decoration:none">
-                    其他
+                   href="#collapseThree" style="text-decoration:none;font-size: 14px">
+                    <strong>公告栏</strong>
                 </a>
             </h4>
         </div>
-        <div id="collapseTwo" class="panel-collapse collapse">
+        <div id="collapseThree" class="panel-collapse collapse">
             <div class="panel-body">
-                Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred
-                nesciunt sapiente ea proident. Ad vegan excepteur butcher vice
-                lomo.
+                <p><a href="http://service.account.weibo.com/derumor?rightmod=1&amp;wvr=6&amp;mod=noticeboard" target="_blank">《​全国辟谣平台》</a></p>
+                <p><a href="http://news.sina.com.cn/c/2013-08-14/154027948112.shtml?rightmod=1&amp;wvr=6" suda-uatrack="key=tblog_home_new&amp;value=rightmod_news" target="_blank">《首都互联网协会发布坚守七条底线倡议书》</a></p>
             </div>
         </div>
     </div>
     </div>
+
+
+    <script type="text/javascript" src="{{ url_for('static',filename='wangEditor/jquery-1.10.2.min.js') }}" ></script>
+    <script src="../static/layer/layer.js"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='wangEditor/wangEditor.min.js') }}" ></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='wangEditor/custom-menu.js') }}" ></script>
+    <script>
+    var post_id;
+        $(function(){
+            var content = "<span class='left clearfix'>转发到:</span><form role='form'><div class='form-group'><textarea class='form-control center-block' placeholder='请输入转发内容' style='height:60px;width:464px;border: 1px solid;padding: 5px 6px 25px;outline:none;resize:none; '></textarea></div></form><button type='button' class='btn btn-warning right'>警告按钮</button>"
+            $(".login-in-share").click(function(){
+                post_id = $(this).attr("post_id")
+                layer.open({
+                    type: 1,//0:信息框; 1:页面; 2:iframe层;	3:加载层;	4:tip层
+                    title:['转发微博', 'font-size:18px;'],//标题
+                    area: ['510px', '300px'],//大小
+                    skin: 'layui-layer-rim',
+                    shadeClose: false, //点击弹层外区域 遮罩关闭
+                    content: "<form role='form'><div style='height:5px'><span id='shareNum' style='float:right;margin-right:15px'></span></div><div class='form-group' style='margin-top:30px'><textarea id='shareText' class='form-control center-block ' placeholder='分享内容不能超过100字' style='height:100px;width:464px;border: 1px solid;padding: 5px 6px 25px;outline:none;resize:none; '></textarea><span id='errorhint' style='float:left;margin-left:15px;margin-top:10px;color:red;display:none'>网络繁忙，请稍后再试</span></div></form><button id='sharebutton' style='float:left;margin-left:400px' type='button' class='W_btn_b' disabled='true'>转发</button>"
+                        });
+                    });
+                })
+
+        $(document).on("input",
+                        "#shareText",
+                        function(){
+                            var length = $("#shareText").val().length;
+                            if(length>99||length==0)
+                            {
+                                $("#shareNum").html("<span>已输入<font style='color:red;font-size:18px;font-family:Constantia, Georgia;'>"+length+"</font>个字</span>");
+                                $("#sharebutton").attr("disabled","true");
+                                $("#sharebutton").removeClass("W_btn_a");
+                                $("#sharebutton").addClass("W_btn_b");
+                            }
+                            else{
+                                 $("#shareNum").html("<span>已输入<font style='font-size:18px;font-family:Constantia, Georgia;'>"+length+"</font>个字</span>");
+                                 $("#sharebutton").removeAttr("disabled");
+                                 $("#sharebutton").removeClass("W_btn_b");
+                                 $("#sharebutton").addClass("W_btn_a");
+                            }
+                            $("#errorhint").hide();
+                        }
+                       );
+        $(document).on("click",
+                        "#sharebutton",
+                        function () {
+                            var text = $("#shareText").val();
+                            params={"post_id":post_id,"text":text};
+                            $.getJSON($SCRIPT_ROOT+'/share',params,function(data,status){
+                                if(data.result)
+                                {
+                                    location.reload()
+                                }
+                                else
+                                {
+                                    $("#errorhint").show();
+                                }
+                            });
+
+                        }
+        )
+    </script>
+    <script type="text/javascript">
+    // 获取元素
+    var div = document.getElementById('div1');
+    // 生成编辑器
+    var editor = new wangEditor(div);
+    //自定义菜单组
+    editor.config.menus = [
+        'bold',
+        'underline',
+        'italic',
+        'eraser',
+        'forecolor',
+        '@someone',
+        'topic'
+     ];
+
+    editor.onchange = function () {
+        var text = editor.$txt.formatText();
+        if(text.length>139||text.length==0)
+        {
+            $("#btn1").attr("disabled","true");
+           // $("#btn1").css("background-color","#ffffee")
+            $("#wordnum").html("<span>已输入<font style='color:red;font-size:18px;font-family:Constantia, Georgia;'>"+text.length+"</font>个字</span>")
+            $("#btn1").removeClass("W_btn_a");
+            $("#btn1").addClass("W_btn_b");
+            //$("#btn1").hide();
+        }
+        else {
+            $("#btn1").removeAttr("disabled");
+            //$("#btn1").show();
+            $("#wordnum").html("<span>已输入<font style='font-size:18px;font-family:Constantia, Georgia;'>"+text.length+"</font>个字</span>");
+            $("#btn1").removeClass("W_btn_b");
+            $("#btn1").addClass("W_btn_a");
+        }
+    }
+    editor.create();
+    $("#keyword").focus();
+    $("#keyword").blur();
+         $('#btn1').click(function () {
+        // 获取编辑器区域完整html代码
+        var $html = editor.$txt.html();
+        // 获取格式化后的纯文本
+        var $formatText = editor.$txt.formatText();
+        params={'post':$html,'text':$formatText};
+        $.getJSON($SCRIPT_ROOT+'/submit',params,function(data,status){
+            if(data.result)
+            {
+                location.reload()
+            }
+        });
+    });
+    {% if show_topic %}
+        editor.$txt.html("<p>#{{ topic.title }}#&nbsp;</p>");
+    {% else %}
+        editor.$txt.html('<p><br></p>');
+    {% endif %}
+
+</script>
 {% endblock %}

@@ -14,7 +14,7 @@
     <link rel="shortcut icon" href="{{ url_for('static',filename = 'favicon.ico') }}" type="image/x-icon">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='theme.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
-
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='wangEditor/wangEditor.min.css') }}">
 {% endblock %}
 
 {% block title %}微博{% endblock %}
@@ -29,11 +29,11 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="/" style="font-size: 24px;cursor: pointer">微博</a>
+            <a class="navbar-brand" href="/index" style="font-size: 24px;cursor: pointer">微博</a>
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-                <li><a href="/" style="cursor: pointer">首页</a> </li>
+                <li><a href="/index" style="cursor: pointer">首页</a> </li>
                 {% if current_user.is_authenticated %}
                 <li>
                     <a href="{{ url_for('main.user',username=current_user.username) }}">
@@ -42,9 +42,9 @@
                 </li>
                 {% endif %}
             </ul>
-            <form class="navbar-form navbar-left" role="search">
+            <form class="navbar-form navbar-left" action="{{ url_for('main.search') }}" role="search">
                 <div class="form-group">
-                    <input type="text" class="form-control" placeholder="Search">
+                    <input id="keyword" type="text" name="keyword" class="form-control" placeholder="Search">
                 </div>
                 <button type="submit" class="wb-top-login" style="height: 38px;margin-top:auto;vertical-align: middle">
                     <span style="color:#ffffff">搜索</span>
@@ -87,17 +87,19 @@
 
 {% block content %}
 
-<div class="wb-main wb-wrap">
-<div class="col-lg-8">
-    {% for message in get_flashed_messages() %}
-    <div class="alert alert-warning">
-        <button type="button" class="close" data-dismiss="alert">&times;</button>
-        {{ message }}
-    </div>
-    {% endfor %}
+
+<div class="wb-main wb-wrap" style="height: auto">
+{% for message in get_flashed_messages() %}
+<div class="alert alert-warning">
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    {{ message }}
+</div>
+{% endfor %}
+{% block user_content %}{% endblock %}
+<div class="col-lg-8" style="background: #ffffff;">
     {% block page_content %}{% endblock %}
 </div>
-<div class="col-lg-4" style="padding-left:30px;padding-right: 0px">
+<div class="col-lg-4" style="padding-left:30px;padding-right: 0px;">
     {% block index_panel %}{% endblock %}
 </div>
 </div>

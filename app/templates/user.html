@@ -4,64 +4,113 @@
 
 {% block title %}微博 - {{ user.username }}{% endblock %}
 
-{% block page_content %}
-<div class="page-header">
-    <img class="img-rounded profile-thumbnail" src="{{ user.gravatar(size=256) }}">
-    <div style="">
-    <form action="" method=post enctype=multipart/form-data>
-        <input type=file name=file><br/>
-        <input type=submit value=Upload>
-    </form>
+{% block user_content %}
+    <div class="main-body-1" style="min-height: 1500px">
+    <div style="border: 1px solid #e7eaf1;background-color: white">
+        <div class="usercovereditor"><img src="../static/image/user.jpg" style="height: 100%;width: 100%"/></div>
+        <div class="row">
+            <div style="position: relative;padding-bottom: 10px;height: auto;min-height: 120px">
+                <div class="div-person-photo">
+                    <img class="person-photo" src="{{ user.gravatar(size=156) }}">
+                </div>
+                <div class="person-info" style="margin-left: 210px;padding-top: 5px">
+                    <div>
+                        <span style="font-size: 26px">{{ user.username }}</span>
+                        <span style="font-size: 18px">{% if user.about_me %}{{ user.about_me }}{% endif %}</span>
+                    </div>
+                    {% if user.name or user.location %}
+                    <p>
+                        {% if user.name %}{{ user.name }}{% endif %}
+                    </p>
+                    <p>
+                        {% if user.location %}
+                            来自 <a href="http://maps.google.com/?q={{ user.location }}">
+                            {{ user.location }}
+                            </a>
+                        {% endif %}
+                    </p>
+                    {% endif %}
+                    <p><a href="mailto:{{ user.email }}">{{ user.email }}</a></p>
+                    <p style="margin-right: 10px">
+                        注册于 {{ moment(user.member_since).format('L') }}
+                        最近登录于 {{ moment(user.last_seen).format('L') }}
+                        {% if user == current_user %}
+                            <a class="btn btn-default" style="float: right;margin-right: 20px;border: 1px solid #0f88eb;margin-top: -7px;" href="{{ url_for('.edit_profile') }} ">编辑个人资料</a>
+                        {% endif %}
+                        {% if current_user.is_administrator() %}
+                            <a class="btn btn-danger" style="float: right;margin-right: 20px;border: 1px solid #0f88eb;margin-top: -7px;" href="{{ url_for('.edit_profile_admin',id=user.id) }}">编辑资料(管理员)</a>
+                        {% endif %}
+                        {% if current_user.can(Permission.FOLLOW) and user != current_user %}
+                        {% if not current_user.is_following(user) %}
+                        <a id="followeds_guanzhu" sign="just a sign" username="{{ user.username }}" onmouseout="out(this)" onmouseover="over(this)" class="btn btn-default" style="float: right;margin-right: 20px;border: 1px solid #0f88eb;margin-top: -7px;">关注</a>
+                        {% else %}
+                        <a id="followeds_guanzhu" sign="just a sign" username="{{ user.username }}" onmouseout="out(this)" onmouseover="over(this)" class="btn btn-default" style="float: right;margin-right: 20px;border: 1px solid #0f88eb;margin-top: -7px;">已关注</a>
+                        {% endif %}
+                        {% endif %}
+                    </p>
+
+                </div>
+            </div>
     </div>
-    <div class="profile-header">
-    <h1>{{ user.username }}</h1>
-    {% if user.name or user.location %}
-    <p>
-        {% if user.name %}{{ user.name }}{% endif %}
-    </p>
-    <p>
-        {% if user.location %}
-            来自 <a href="http://maps.google.com/?q={{ user.location }}">
-            {{ user.location }}
-            </a>
-        {% endif %}
-    </p>
-    {% endif %}
-    {% if current_user.is_administrator() %}
-    <p><a href="mailto:{{ user.email }}">{{ user.email }}</a></p>
-    {% endif %}
-    {% if user.about_me %}<p>{{ user.about_me }}</p>{% endif %}
-    <p>
-        注册于 {{ moment(user.member_since).format('L') }}
-        最近登录于 {{ moment(user.last_seen).format('L') }}
-    </p>
-    <p>
-        {% if current_user.can(Permission.FOLLOW) and user != current_user %}
-            {% if not current_user.is_following(user) %}
-            <a href="{{ url_for('.follow', username=user.username) }}" class="btn btn-primary">关注</a>
-            {% else %}
-            <a href="{{ url_for('.unfollow', username=user.username) }}" class="btn btn-default">取消关注</a>
-            {% endif %}
-        {% endif %}
-        <a href="{{ url_for('.followers', username=user.username) }}">TA的粉丝： <span class="badge">{{ user.followers.count() - 1 }}</span></a>
-        <a href="{{ url_for('.followed_by', username=user.username) }}">TA的关注： <span class="badge">{{ user.followed.count() - 1 }}</span></a>
-        {% if current_user.is_authenticated and user != current_user and user.is_following(current_user) %}
-        | <span class="label label-default">TA关注了你</span>
-        {% endif %}
-    </p>
-    <p>
-        {% if user == current_user %}
-            <a class="btn btn-default" href="{{ url_for('.edit_profile') }} ">编辑个人资料</a>
-        {% endif %}
-        {% if current_user.is_administrator() %}
-        <a class="btn btn-danger" href="{{ url_for('.edit_profile_admin',id=user.id) }}">编辑资料(管理员)</a>
-        {% endif %}
-    </p>
+    <div>
+        <div  class="profile-maincolumn" style="height: auto;margin-top: 10px;background-color: white;">
+            <div class="home-directory" style="display: flex;margin-top: 15px;">
+                <div style="display: block;text-align: center;width: 90px"><a id="func1" style="cursor: pointer">微博</a></div>
+                <div style="display: block;text-align: center;width: 90px"><a id="func2" style="cursor: pointer">收藏</a></div>
+                <div style="display: block;text-align: center;width: 90px"><a id="func3" style="cursor: pointer">关注</a></div>
+                <div style="display: block;text-align: center;width: 90px"><a id="func4" style="cursor: pointer">粉丝</a></div>
+            </div>
+            <div id="line-1" class="test-1"></div>
+            <div id="user_weibo"style="margin-right: 40px;margin-left: 10px">
+            {% include '_posts.html' %}
+            <div class="pagination">
+            {{ macros.pagination_widget(pagination,'main.user',username=user.username) }}
+            </div>
+            </div>
+            <div id="user_shoucang" style="margin-right: 40px;margin-left: 10px;display: none">
+                {% include '_collects.html' %}
+            </div>
+            <div id="user_guanzhu" style="margin-right: 40px;margin-left: 10px;display: none">
+                {% include '_followeds.html' %}
+            </div>
+            <div id="user_fensi" style="margin-right: 40px;margin-left: 10px;display: none">
+                {% include '_followers.html' %}
+            </div>
+        </div>
+        <div  class="profile-sidecolumn" style="margin-top: 10px">
+            <div class="followshipcard" style="background-color: white">
+                <a id="user_guanzhu_1" style="cursor: pointer">
+                    <div class="numberboard-name" style="color: #8590a6">关注了</div>
+                    <div class="numberboard-value followeds_count" style="color: #262626">{{ user.followed.count() - 1 }}</div>
+                </a>
+                <a id="user_fensi_1" style="cursor: pointer">
+                    <div class="numberboard-name" style="color: #8590a6">关注者</div>
+                    <div class="numberboard-value followers_count" style="color: #262626">{{ user.followers.count() - 1 }}</div>
+                </a>
+            </div>
+            <div class="profile-lightlist"style="margin-top: 10px">
+                <div class="panel-group" id="accordion">
+                    <div class="panel panel-deault">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#accordion"
+                                   href="#collapseOne" style="font-size: 14px">
+                                    <strong>最近参与的话题</strong>
+                                </a>
+                            </h4>
+                        </div>
+                        {% for topic in topics %}
+                            <div id="collapseOne" class="panel-collapse collapse in">
+                                <div class="panel-body replace_body">
+                                    #{{ topic.title }}#
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
-<h3>{{ user.username }}的微博</h3>
-{% include '_posts.html' %}
-<div class="pagination">
-    {{ macros.pagination_widget(pagination,'main.index') }}
-</div>
+    </div>
+    </div>
 {% endblock %}

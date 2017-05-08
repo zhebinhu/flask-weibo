@@ -1,16 +1,15 @@
 #-*-coding:utf-8-*-
-from flask import Blueprint, redirect, request, url_for, g
+from flask import Blueprint, redirect, request, url_for
 
 main = Blueprint('main',__name__)
 
 from . import views,errors
-from ..models import Permission, Role, User, Post
+from ..models import Permission
 
 
 @main.before_app_first_request
 def before_request():
     from app import db
-    db.create_all()
     from flask_login import current_user
     if current_user.is_authenticated:
         current_user.ping()

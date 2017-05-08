@@ -1,0 +1,27 @@
+<table class="table followers" style="margin-top: 16px">
+    {% for follower in followers %}
+    {% if follower.user != user %}
+    <tr class="sellpadding" style="padding-left: 20px;padding-top: 16px;padding-bottom: 16px;height: 80px">
+        <td style="padding: 0px;vertical-align: middle;width:45px"><div><img class="img-rounded" style="margin-left: 10px;margin-right: 20px" src="{{ follower.user.gravatar(size=60) }}"></div></td>
+        <td style="padding: 0px;">
+            <div style="height: 100px;padding-top: 17px;position: relative">
+                <div>
+                 <a style="font-weight: 800;font-size: 18px;vertical-align: top;color: black;" href="{{ url_for('.user', username = follower.user.username) }}">
+                {{ follower.user.username }}
+                </a>
+                </div>
+                <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;width: 200px;margin-bottom: 0px;color: #555;font-size: 16px;">{{ follower.user.about_me }}</div>
+                <div style="font-size: 13px;color: #888">关注日期 {{ moment(follower.timestamp).format('L') }}</div>
+            </div>
+        </td>
+        {% if current_user.can(Permission.FOLLOW) and follower.user != current_user %}
+        {% if not current_user.is_following(follower.user) %}
+            <td style="vertical-align: middle"><div><a id="followeds_guanzhu" username="{{ follower.user.username }}" class="btn followers_guanzhu" onmouseout="out(this)" onmouseover="over(this)" style="width: 100px;background-color: rgb(15, 136, 235);float: right;color: #FFFFFF">关注</a></div></td>
+        {% else %}
+            <td style="vertical-align: middle"><div><a id="followeds_guanzhu" username="{{ follower.user.username }}" class="btn followers_guanzhu" onmouseout="out(this)" onmouseover="over(this)" style="width: 100px;background-color: rgb(195, 204, 217);float: right;color: #FFFFFF">已关注</a></div></td>
+        {% endif %}
+        {% endif %}
+    </tr>
+    {% endif %}
+    {% endfor %}
+</table>

@@ -3,7 +3,7 @@
 {% import "bootstrap/wtf.html" as wtf %}
 {% import "_macros.html" as macros %}
 
-{% block title %}首页-微博{% endblock %}
+{% block title %}微博 - {% if show_search %}搜索{% elif show_topic %}话题{% else %}首页{% endif %}{% endblock %}
 {% block scripts %}
 {{ super() }}
 {{ pagedown.include_pagedown() }}

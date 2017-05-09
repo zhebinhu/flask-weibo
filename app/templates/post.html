@@ -10,7 +10,7 @@
 <h4 id="comments">评论</h4>
 {% if current_user.can(Permission.COMMENT) %}
 <div class="comment-form">
-    <span id="commentNum" style="float: right">bihari</span>
+    <span id="commentNum" style="float: right"></span>
     {{ wtf.quick_form(commentform) }}
 </div>
 {% endif %}

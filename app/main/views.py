@@ -239,7 +239,28 @@ def edit(id):
         abort(403)
     form = PostForm()
     if form.validate_on_submit():
-        post.body = form.body.data
+        text = form.body.data
+        text = re.sub(chr(160), chr(32), text)  # 将HTML的160号空格替换为32号空格
+        topics = re.findall('\#([^\#|.]+)\#', text)
+        relates = re.findall('\@([^\@|.]+?)\s', text)  # 非贪婪匹配
+        for topic in set(topics):
+            t = Topic.query.filter_by(title=topic).first()
+            if t is not None:
+                t.posts.append(post)
+                t.count += 1
+            else:
+                t = Topic(title=topic)
+                t.posts.append(post)
+            db.session.add(t)
+        for relate in set(relates):
+            if User.query.filter_by(username=relate).first() is not None:
+                r = Relate.query.filter_by(post_id=id, username=relate).first()
+                if r is not None:
+                    r.update()
+                else:
+                    r = Relate(post_id=id, username=relate)
+                db.session.add(r)
+        post.body = text
         post.body_html = form.body.data
         db.session.add(post)
         return redirect(url_for('.post', id=post.id))
@@ -532,13 +553,7 @@ def submit():
             db.session.add(t)
         for relate in set(relates):
             if User.query.filter_by(username=relate).first() is not None:
-                r = Relate.query.filter_by(username=relate, post_id=post.id).first()
-                if r is not None:
-                    r.update()
-                else:
-                    r = Relate(username=relate, post_id=post.id)
-                db.session.add(r)
-        db.session.commit()
+                db.session.add(Relate(username=relate, post_id=post.id))
         return jsonify(result=True)
     return jsonify(result=False)
 
@@ -561,10 +576,27 @@ def share():
     text = request.args.get('text')
     if post_id is None or text is None:
         return jsonify(result=False)
-    username = Post.query.filter_by(id=post_id).first().auth.username
-    post = Post(body=text, body_html=text, author=current_user._get_current_object(),forward_id=post_id)
-    db.session.add(post)
-    db.session.commit()
-    relate = Relate(username=username,post_id=post.id)
-    db.session.add(relate)
-    return jsonify(result=True)
+    if current_user.can(Permission.WRITE_ARTICLES) and text is not None:
+        text = re.sub(chr(160), chr(32), text)  # 将HTML的160号空格替换为32号空格
+        topics = re.findall('\#([^\#|.]+)\#', text)
+        relates = re.findall('\@([^\@|.]+?)\s', text)  # 非贪婪匹配
+        username = Post.query.filter_by(id=post_id).first().auth.username
+        post = Post(body=text, body_html=text, author=current_user._get_current_object(),forward_id=post_id)
+        db.session.add(post)
+        db.session.commit()
+        db.session.add(Relate(username=username,post_id=post.id))
+        for topic in set(topics):
+            t = Topic.query.filter_by(title=topic).first()
+            if t is not None:
+                t.posts.append(post)
+                t.count += 1
+            else:
+                t = Topic(title=topic)
+                t.posts.append(post)
+            db.session.add(t)
+        for relate in set(relates):
+            if User.query.filter_by(username=relate).first() is not None:
+                db.session.add(Relate(username=relate, post_id=post.id))
+        db.session.commit()
+        return jsonify(result=True)
+    return jsonify(result=False)

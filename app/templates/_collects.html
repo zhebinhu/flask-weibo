@@ -62,7 +62,7 @@
                             <div class="pull-right" style="padding-top: 18px">
                                     {% if current_user.can(Permission.LIKE) %}
                                         <a post_id="{{ post.forward_res.id }}" onmouseout="out(this)" onmouseover="over(this)" class="glyphicon wb-post-footer login-in-collect  {% if current_user.is_collecting(post.forward_res) %}glyphicon-star">已收藏{% else %}glyphicon-star-empty">收藏{% endif %}</a>&nbsp&nbsp
-                                        <a class="glyphicon glyphicon-share wb-post-footer">分享</a>&nbsp&nbsp
+                                        <a post_id="{{ post.forward_res.id }}" class="glyphicon glyphicon-share wb-post-footer login-in-share">分享</a>&nbsp&nbsp
                                         {% if current_user.is_liking(post.forward_res) %}
                                             <a post_id="{{ post.forward_res.id }}" class="glyphicon glyphicon-thumbs-up wb-post-footer login-in-like" >取消赞{% if post.forward_res.users_liked.count() %}({{ post.forward_res.users_liked.count() }}){% endif %}</a>&nbsp&nbsp
                                         {% else %}
@@ -83,7 +83,7 @@
 
                     {% if current_user.can(Permission.LIKE) %}
                         <a post_id="{{ post.id }}" onmouseout="out(this)" onmouseover="over(this)" class="glyphicon wb-post-footer login-in-collect  {% if current_user.is_collecting(post) %}glyphicon-star">已收藏{% else %}glyphicon-star-empty">收藏{% endif %}</a>&nbsp&nbsp
-                        <a class="glyphicon glyphicon-share wb-post-footer">分享</a>&nbsp&nbsp
+                        <a post_id="{{ post.forward_res.id }}" class="glyphicon glyphicon-share wb-post-footer login-in-share">分享</a>&nbsp&nbsp
                         {% if current_user.is_liking(post) %}
                             <a post_id="{{ post.id }}" class="glyphicon glyphicon-thumbs-up wb-post-footer login-in-like" >取消赞{% if post.users_liked.count() %}({{ post.users_liked.count() }}){% endif %}</a>&nbsp&nbsp
                         {% else %}

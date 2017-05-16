@@ -113,4 +113,123 @@
     </div>
     </div>
     </div>
+    <script type="text/javascript" src="{{ url_for('static',filename='wangEditor/jquery-1.10.2.min.js') }}" ></script>
+    <script src="../static/layer/layer.js"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='wangEditor/wangEditor.min.js') }}" ></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='wangEditor/custom-menu.js') }}" ></script>
+    <script>
+    var post_id;
+        $(function(){
+            var content = "<span class='left clearfix'>转发到:</span><form role='form'><div class='form-group'><textarea class='form-control center-block' placeholder='请输入转发内容' style='height:60px;width:464px;border: 1px solid;padding: 5px 6px 25px;outline:none;resize:none; '></textarea></div></form><button type='button' class='btn btn-warning right'>警告按钮</button>"
+            $(".login-in-share").click(function(){
+                post_id = $(this).attr("post_id")
+                layer.open({
+                    type: 1,//0:信息框; 1:页面; 2:iframe层;	3:加载层;	4:tip层
+                    title:['转发微博', 'font-size:18px;'],//标题
+                    area: ['510px', '300px'],//大小
+                    skin: 'layui-layer-rim',
+                    shadeClose: false, //点击弹层外区域 遮罩关闭
+                    content: "<form role='form'><div style='height:5px'><span id='shareNum' style='float:right;margin-right:15px'></span></div><div class='form-group' style='margin-top:30px'><textarea id='shareText' class='form-control center-block ' placeholder='分享内容不能超过100字' style='height:100px;width:464px;border: 1px solid;padding: 5px 6px 25px;outline:none;resize:none; '></textarea><span id='errorhint' style='float:left;margin-left:15px;margin-top:10px;color:red;display:none'>网络繁忙，请稍后再试</span></div></form><button id='sharebutton' style='float:left;margin-left:400px' type='button' class='W_btn_b' disabled='true'>转发</button>"
+                        });
+                    });
+                })
+
+        $(document).on("input",
+                        "#shareText",
+                        function(){
+                            var length = $("#shareText").val().length;
+                            if(length>99||length==0)
+                            {
+                                $("#shareNum").html("<span>已输入<font style='color:red;font-size:18px;font-family:Constantia, Georgia;'>"+length+"</font>个字</span>");
+                                $("#sharebutton").attr("disabled","true");
+                                $("#sharebutton").removeClass("W_btn_a");
+                                $("#sharebutton").addClass("W_btn_b");
+                            }
+                            else{
+                                 $("#shareNum").html("<span>已输入<font style='font-size:18px;font-family:Constantia, Georgia;'>"+length+"</font>个字</span>");
+                                 $("#sharebutton").removeAttr("disabled");
+                                 $("#sharebutton").removeClass("W_btn_b");
+                                 $("#sharebutton").addClass("W_btn_a");
+                            }
+                            $("#errorhint").hide();
+                        }
+                       );
+        $(document).on("click",
+                        "#sharebutton",
+                        function () {
+                            var text = $("#shareText").val();
+                            params={"post_id":post_id,"text":text};
+                            $.getJSON($SCRIPT_ROOT+'/share',params,function(data,status){
+                                if(data.result)
+                                {
+                                    location.reload()
+                                }
+                                else
+                                {
+                                    $("#errorhint").show();
+                                }
+                            });
+
+                        }
+        )
+    </script>
+    <script type="text/javascript">
+    // 获取元素
+    var div = document.getElementById('div1');
+    // 生成编辑器
+    var editor = new wangEditor(div);
+    //自定义菜单组
+    editor.config.menus = [
+        'bold',
+        'underline',
+        'italic',
+        'eraser',
+        'forecolor',
+        '@someone',
+        'topic',
+        'emotion'
+     ];
+
+    editor.onchange = function () {
+        var text = editor.$txt.formatText();
+        if(text.length>139||text.length==0)
+        {
+            $("#btn1").attr("disabled","true");
+           // $("#btn1").css("background-color","#ffffee")
+            $("#wordnum").html("<span>已输入<font style='color:red;font-size:18px;font-family:Constantia, Georgia;'>"+text.length+"</font>个字</span>")
+            $("#btn1").removeClass("W_btn_a");
+            $("#btn1").addClass("W_btn_b");
+            //$("#btn1").hide();
+        }
+        else {
+            $("#btn1").removeAttr("disabled");
+            //$("#btn1").show();
+            $("#wordnum").html("<span>已输入<font style='font-size:18px;font-family:Constantia, Georgia;'>"+text.length+"</font>个字</span>");
+            $("#btn1").removeClass("W_btn_b");
+            $("#btn1").addClass("W_btn_a");
+        }
+    }
+    editor.create();
+    $("#keyword").focus();
+    $("#keyword").blur();
+         $('#btn1').click(function () {
+        // 获取编辑器区域完整html代码
+        var $html = editor.$txt.html();
+        // 获取格式化后的纯文本
+        var $formatText = editor.$txt.formatText();
+        params={'post':$html,'text':$formatText};
+        $.getJSON($SCRIPT_ROOT+'/submit',params,function(data,status){
+            if(data.result)
+            {
+                location.reload()
+            }
+        });
+    });
+    {% if show_topic %}
+        editor.$txt.html("<p>#{{ topic.title }}#&nbsp;</p>");
+    {% else %}
+        editor.$txt.html('<p><br></p>');
+    {% endif %}
+
+</script>
 {% endblock %}

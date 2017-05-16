@@ -33,7 +33,9 @@
                     <br/>
                     <span style="font-size: 10px">{{ moment(post.timestamp).fromNow() }}</span>
                     {% if post.body_html %}
-                    {{ post.body_html | safe }}
+                    <div class="replace_body" style="margin-right: 20px">
+                    {{ post.body_html | safe}}
+                    </div>
                     {% else %}
                     {{ post.body }}
                     {% endif %}

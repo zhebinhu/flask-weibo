@@ -1,5 +1,5 @@
 # blog
-### www.huzb.me
+### www.huzb.me　（已失效）
 
 You need to add an environment variable file in root directory named .env.In general,it should contain following items.
 
